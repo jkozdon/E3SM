@@ -18,29 +18,29 @@ module HommeNVector
   use, intrinsic :: iso_c_binding
   use fsundials_nvector_mod
 
-  use element_mod,   only: element_t
+  use element_mod, only: element_t
   use element_state, only: timelevels
-  use parallel_mod,  only: parallel_t
+  use parallel_mod, only: parallel_t
 
   implicit none
   public
 
   ! Fortran object stored as N_Vector content
   type :: NVec_t
-     type(element_t), pointer :: elem(:)  ! element data
-     integer                  :: nets     ! starting index
-     integer                  :: nete     ! ending index
-     integer                  :: tl_idx   ! time level index
-     logical                  :: own_data ! vec owns data
+    type(element_t), pointer :: elem(:)  ! element data
+    integer                  :: nets     ! starting index
+    integer                  :: nete     ! ending index
+    integer                  :: tl_idx   ! time level index
+    logical                  :: own_data ! vec owns data
   end type NVec_t
 
   save
 
   ! number of vectors available in the registry (time levels)
-  integer, parameter :: RegistryLength=timelevels
+  integer, parameter :: RegistryLength = timelevels
 
   ! indicates if a slot in the registry is in use
-  logical :: HommeNVectorRegistry(RegistryLength)=.false.
+  logical :: HommeNVectorRegistry(RegistryLength) = .false.
 
   ! parallelization data
   type(parallel_t), pointer :: par_ptr
@@ -70,12 +70,12 @@ contains
     !======= Internals ============
 
     ! search for first free slot in the registry
-    do i=1,RegistryLength
-       if (.not. HommeNVectorRegistry(i)) then
-          HommeNVectorRegistry(i) = .true.
-          ReserveHommeNVectorRegistryIdx = i
-          return
-       end if
+    do i = 1, RegistryLength
+      if (.not. HommeNVectorRegistry(i)) then
+        HommeNVectorRegistry(i) = .true.
+        ReserveHommeNVectorRegistryIdx = i
+        return
+      end if
     end do
 
     ! no open slot found
@@ -99,7 +99,7 @@ contains
     use element_mod, only: element_t
 
     implicit none
-    type (element_t), target    :: elem(:)
+    type(element_t), target    :: elem(:)
     integer, intent(in)         :: nets
     integer, intent(in)         :: nete
     integer, intent(in)         :: tl_idx
@@ -116,21 +116,21 @@ contains
 
     ! if registry index is already taken, return failure
     if (HommeNVectorRegistry(tl_idx)) then
-       ierr = 1
-       sunvec_y => null()
-       return
+      ierr = 1
+      sunvec_y => null()
+      return
     end if
 
     ! allocate output N_Vector structure
     sunvec_y => FN_VNewEmpty()
 
     ! allocate and fill content structure
-    allocate(content)
-    content%elem     => elem
-    content%nets     =  nets
-    content%nete     =  nete
-    content%tl_idx   =  tl_idx
-    content%own_data =  .false.
+    allocate (content)
+    content%elem => elem
+    content%nets = nets
+    content%nete = nete
+    content%tl_idx = tl_idx
+    content%own_data = .false.
 
     ! mark the index in the registry as used
     HommeNVectorRegistry(tl_idx) = .true.
@@ -143,21 +143,21 @@ contains
 
     ! set function pointers to vector operations
     ops%nvgetvectorid = c_funloc(FN_VGetVectorID_HOMME)
-    ops%nvclone       = c_funloc(FN_VClone_HOMME)
-    ops%nvdestroy     = c_funloc(FN_VDestroy_HOMME)
-    ops%nvconst       = c_funloc(FN_VConst_HOMME)
-    ops%nvdotprod     = c_funloc(FN_VDotProd_HOMME)
-    ops%nvlinearsum   = c_funloc(FN_VLinearSum_HOMME)
-    ops%nvprod        = c_funloc(FN_VProd_HOMME)
-    ops%nvdiv         = c_funloc(FN_VDiv_HOMME)
-    ops%nvscale       = c_funloc(FN_VScale_HOMME)
-    ops%nvabs         = c_funloc(FN_VAbs_HOMME)
-    ops%nvinv         = c_funloc(FN_VInv_HOMME)
-    ops%nvaddconst    = c_funloc(FN_VAddConst_HOMME)
-    ops%nvmaxnorm     = c_funloc(FN_VMaxNorm_HOMME)
-    ops%nvwrmsnorm    = c_funloc(FN_VWRMSNorm_HOMME)
-    ops%nvmin         = c_funloc(FN_VMin_HOMME)
-    ops%nvprint       = c_funloc(FN_VPrint_HOMME)
+    ops%nvclone = c_funloc(FN_VClone_HOMME)
+    ops%nvdestroy = c_funloc(FN_VDestroy_HOMME)
+    ops%nvconst = c_funloc(FN_VConst_HOMME)
+    ops%nvdotprod = c_funloc(FN_VDotProd_HOMME)
+    ops%nvlinearsum = c_funloc(FN_VLinearSum_HOMME)
+    ops%nvprod = c_funloc(FN_VProd_HOMME)
+    ops%nvdiv = c_funloc(FN_VDiv_HOMME)
+    ops%nvscale = c_funloc(FN_VScale_HOMME)
+    ops%nvabs = c_funloc(FN_VAbs_HOMME)
+    ops%nvinv = c_funloc(FN_VInv_HOMME)
+    ops%nvaddconst = c_funloc(FN_VAddConst_HOMME)
+    ops%nvmaxnorm = c_funloc(FN_VMaxNorm_HOMME)
+    ops%nvwrmsnorm = c_funloc(FN_VWRMSNorm_HOMME)
+    ops%nvmin = c_funloc(FN_VMin_HOMME)
+    ops%nvprint = c_funloc(FN_VPrint_HOMME)
 
     return
 
@@ -196,7 +196,7 @@ contains
     use, intrinsic :: iso_c_binding
 
     use dimensions_mod, only: np, nlev, nlevp
-    use MPI,            only: MPI_comm_rank
+    use MPI, only: MPI_comm_rank
 
     implicit none
     type(N_Vector)        :: sunvec_x
@@ -213,33 +213,33 @@ contains
     call MPI_comm_rank(par_ptr%comm, rank, ierr)
 
     ! print vector data
-    do inlev=1,nlev
-       do ie=x%nets,x%nete
-          do inpx=1,np
-             do inpy=1,np
-                print '(/,"proc ",i2,",", " elem ",i4,",", " u(",i1,",",i1,",",i2,") = ",f15.5)', &
-                     rank, ie, inpx, inpy, inlev, x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx)
-                print '("proc ",i2,",", " elem ",i4,",", " v(",i1,",",i1,",",i2,") = ",f15.5)', &
-                     rank, ie, inpx, inpy, inlev, x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx)
-                print '("proc ",i2,",", " elem ",i4,",", " vtheta_dp(",i1,",",i1,",",i2,") = ",f15.5)', &
-                     rank, ie, inpx, inpy, inlev, x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx)
-                print '("proc ",i2,",", " elem ",i4,",", " dp3d(",i1,",",i1,",",i2,") = ",f15.5,/)', &
-                     rank, ie, inpx, inpy, inlev, x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx)
-             end do
+    do inlev = 1, nlev
+      do ie = x%nets, x%nete
+        do inpx = 1, np
+          do inpy = 1, np
+            print '(/,"proc ",i2,",", " elem ",i4,",", " u(",i1,",",i1,",",i2,") = ",f15.5)', &
+              rank, ie, inpx, inpy, inlev, x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx)
+            print '("proc ",i2,",", " elem ",i4,",", " v(",i1,",",i1,",",i2,") = ",f15.5)', &
+              rank, ie, inpx, inpy, inlev, x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx)
+            print '("proc ",i2,",", " elem ",i4,",", " vtheta_dp(",i1,",",i1,",",i2,") = ",f15.5)', &
+              rank, ie, inpx, inpy, inlev, x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx)
+            print '("proc ",i2,",", " elem ",i4,",", " dp3d(",i1,",",i1,",",i2,") = ",f15.5,/)', &
+              rank, ie, inpx, inpy, inlev, x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx)
           end do
-       end do
+        end do
+      end do
     end do
-    do inlev=1,nlevp
-       do ie=x%nets,x%nete
-          do inpx=1,np
-             do inpy=1,np
-                print '("proc ",i2,",", " elem ",i4,",", " w(",i1,",",i1,",",i2,") = ",f15.5)', &
-                     rank, ie, inpx, inpy, inlev, x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx)
-                print '("proc ",i2,",", " elem ",i4,",", " phinh(",i1,",",i1,",",i2,") = ",f15.5)', &
-                     rank, ie, inpx, inpy, inlev, x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx)
-             end do
+    do inlev = 1, nlevp
+      do ie = x%nets, x%nete
+        do inpx = 1, np
+          do inpy = 1, np
+            print '("proc ",i2,",", " elem ",i4,",", " w(",i1,",",i1,",",i2,") = ",f15.5)', &
+              rank, ie, inpx, inpy, inlev, x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx)
+            print '("proc ",i2,",", " elem ",i4,",", " phinh(",i1,",",i1,",",i2,") = ",f15.5)', &
+              rank, ie, inpx, inpy, inlev, x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx)
           end do
-       end do
+        end do
+      end do
     end do
 
     return
@@ -249,7 +249,7 @@ contains
   !=============================================================================
 
   integer(N_Vector_ID) function FN_VGetVectorID_HOMME(sunvec_y) &
-       result(id) bind(C)
+    result(id) bind(C)
     !---------------------------------------------------------------------------
     ! Return the vector ID
     !---------------------------------------------------------------------------
@@ -296,7 +296,7 @@ contains
 
     ! allocate output N_Vector structure
     sunvec_y => FN_VNewEmpty()
-    if (.not.associated(sunvec_y)) then
+    if (.not. associated(sunvec_y)) then
       call abortmp('FN_VClone_HOMME failed (unassociated vector)')
     end if
 
@@ -310,11 +310,11 @@ contains
     x => FN_VGetContent(sunvec_x)
 
     ! allocate and fill content structure
-    allocate(y)
-    y%elem     => x%elem
-    y%nets     =  x%nets
-    y%nete     =  x%nete
-    y%tl_idx   =  tl_idx
+    allocate (y)
+    y%elem => x%elem
+    y%nets = x%nets
+    y%nete = x%nete
+    y%tl_idx = tl_idx
     y%own_data = .true.
 
     ! attach the content structure to the output N_Vector
@@ -349,10 +349,10 @@ contains
     if (x%own_data) HommeNVectorRegistry(x%tl_idx) = .false.
 
     ! detach pointer
-    if (associated(x%elem)) nullify(x%elem)
+    if (associated(x%elem)) nullify (x%elem)
 
     ! deallocate the underlying Fortran object (the content)
-    deallocate(x)
+    deallocate (x)
 
     ! set N_Vector structure members to NULL
     sunvec_x%content = c_null_ptr
@@ -386,12 +386,12 @@ contains
     z => FN_VGetContent(sunvec_z)
 
     ! perform vector operation
-    do ie=z%nets,z%nete
-       z%elem(ie)%state%v(:,:,:,:,z%tl_idx) = cval
-       z%elem(ie)%state%w_i(:,:,:,z%tl_idx) = cval
-       z%elem(ie)%state%phinh_i(:,:,:,z%tl_idx) = cval
-       z%elem(ie)%state%vtheta_dp(:,:,:,z%tl_idx) = cval
-       z%elem(ie)%state%dp3d(:,:,:,z%tl_idx) = cval
+    do ie = z%nets, z%nete
+      z%elem(ie)%state%v(:, :, :, :, z%tl_idx) = cval
+      z%elem(ie)%state%w_i(:, :, :, z%tl_idx) = cval
+      z%elem(ie)%state%phinh_i(:, :, :, z%tl_idx) = cval
+      z%elem(ie)%state%vtheta_dp(:, :, :, z%tl_idx) = cval
+      z%elem(ie)%state%dp3d(:, :, :, z%tl_idx) = cval
     end do
 
     return
@@ -401,14 +401,14 @@ contains
   !=============================================================================
 
   real(c_double) function FN_VDotProd_HOMME(sunvec_x, sunvec_y) &
-       result(cval) bind(C)
+    result(cval) bind(C)
     !---------------------------------------------------------------------------
     ! c = <x,y>  (only include 'active' data; no ghost cells, etc.)
     !---------------------------------------------------------------------------
     use, intrinsic :: iso_c_binding
 
-    use dimensions_mod,   only: np, nlev, nlevp
-    use parallel_mod,     only: global_shared_buf, global_shared_sum
+    use dimensions_mod, only: np, nlev, nlevp
+    use parallel_mod, only: global_shared_buf, global_shared_sum
     use global_norms_mod, only: wrap_repro_sum
 
     implicit none
@@ -429,36 +429,36 @@ contains
     ! NOTE: this use of spheremp acknowledges the fact that unknowns are
     ! duplicated, in that the sum including spheremp performs the
     ! integral over the domain
-    do ie=x%nets,x%nete
-       global_shared_buf(ie,1) = 0.d0
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                global_shared_buf(ie,1) = global_shared_buf(ie,1) + &
-                     (x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%v(inpx,inpy,1,inlev,y%tl_idx) + &
-                     x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%v(inpx,inpy,2,inlev,y%tl_idx) + &
-                     x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,y%tl_idx) + &
-                     x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%dp3d(inpx,inpy,inlev,y%tl_idx)) &
-                     * x%elem(ie)%spheremp(inpx,inpy)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                global_shared_buf(ie,1) = global_shared_buf(ie,1) + &
-                     (x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%w_i(inpx,inpy,inlev,y%tl_idx) + &
-                     x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%phinh_i(inpx,inpy,inlev,y%tl_idx)) &
-                     * x%elem(ie)%spheremp(inpx,inpy)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    do ie = x%nets, x%nete
+      global_shared_buf(ie, 1) = 0.d0
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            global_shared_buf(ie, 1) = global_shared_buf(ie, 1) + &
+                                       (x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx)* &
+                                        y%elem(ie)%state%v(inpx, inpy, 1, inlev, y%tl_idx) + &
+                                        x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx)* &
+                                        y%elem(ie)%state%v(inpx, inpy, 2, inlev, y%tl_idx) + &
+                                        x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx)* &
+                                        y%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, y%tl_idx) + &
+                                        x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx)* &
+                                        y%elem(ie)%state%dp3d(inpx, inpy, inlev, y%tl_idx)) &
+                                       *x%elem(ie)%spheremp(inpx, inpy)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            global_shared_buf(ie, 1) = global_shared_buf(ie, 1) + &
+                                       (x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx)* &
+                                        y%elem(ie)%state%w_i(inpx, inpy, inlev, y%tl_idx) + &
+                                        x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx)* &
+                                        y%elem(ie)%state%phinh_i(inpx, inpy, inlev, y%tl_idx)) &
+                                       *x%elem(ie)%spheremp(inpx, inpy)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     ! accumulate sum using wrap_repro_sum and then copy to cval
@@ -473,7 +473,7 @@ contains
   !=============================================================================
 
   subroutine FN_VLinearSum_HOMME(aval, sunvec_x, bval, sunvec_y, sunvec_z) &
-       bind(C)
+    bind(C)
     !---------------------------------------------------------------------------
     ! z = a*x + b*y
     !---------------------------------------------------------------------------
@@ -502,37 +502,37 @@ contains
     z => FN_VGetContent(sunvec_z)
 
     ! perform vector operation
-    do ie=z%nets,z%nete
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%v(inpx,inpy,1,inlev,z%tl_idx) = &
-                     aval * x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx) + &
-                     bval * y%elem(ie)%state%v(inpx,inpy,1,inlev,y%tl_idx)
-                z%elem(ie)%state%v(inpx,inpy,2,inlev,z%tl_idx) = &
-                     aval * x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx) + &
-                     bval * y%elem(ie)%state%v(inpx,inpy,2,inlev,y%tl_idx)
-                z%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,z%tl_idx) = &
-                     aval * x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx) + &
-                     bval * y%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,y%tl_idx)
-                z%elem(ie)%state%dp3d(inpx,inpy,inlev,z%tl_idx) = &
-                     aval * x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx) + &
-                     bval * y%elem(ie)%state%dp3d(inpx,inpy,inlev,y%tl_idx)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%w_i(inpx,inpy,inlev,z%tl_idx) = &
-                     aval * x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx) + &
-                     bval * y%elem(ie)%state%w_i(inpx,inpy,inlev,y%tl_idx)
-                z%elem(ie)%state%phinh_i(inpx,inpy,inlev,z%tl_idx) = &
-                     aval * x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx) + &
-                     bval * y%elem(ie)%state%phinh_i(inpx,inpy,inlev,y%tl_idx)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    do ie = z%nets, z%nete
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%v(inpx, inpy, 1, inlev, z%tl_idx) = &
+              aval*x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx) + &
+              bval*y%elem(ie)%state%v(inpx, inpy, 1, inlev, y%tl_idx)
+            z%elem(ie)%state%v(inpx, inpy, 2, inlev, z%tl_idx) = &
+              aval*x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx) + &
+              bval*y%elem(ie)%state%v(inpx, inpy, 2, inlev, y%tl_idx)
+            z%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, z%tl_idx) = &
+              aval*x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx) + &
+              bval*y%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, y%tl_idx)
+            z%elem(ie)%state%dp3d(inpx, inpy, inlev, z%tl_idx) = &
+              aval*x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx) + &
+              bval*y%elem(ie)%state%dp3d(inpx, inpy, inlev, y%tl_idx)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%w_i(inpx, inpy, inlev, z%tl_idx) = &
+              aval*x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx) + &
+              bval*y%elem(ie)%state%w_i(inpx, inpy, inlev, y%tl_idx)
+            z%elem(ie)%state%phinh_i(inpx, inpy, inlev, z%tl_idx) = &
+              aval*x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx) + &
+              bval*y%elem(ie)%state%phinh_i(inpx, inpy, inlev, y%tl_idx)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     return
@@ -568,37 +568,37 @@ contains
     z => FN_VGetContent(sunvec_z)
 
     ! perform vector operation
-    do ie=z%nets,z%nete
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%v(inpx,inpy,1,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%v(inpx,inpy,1,inlev,y%tl_idx)
-                z%elem(ie)%state%v(inpx,inpy,2,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%v(inpx,inpy,2,inlev,y%tl_idx)
-                z%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,y%tl_idx)
-                z%elem(ie)%state%dp3d(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%dp3d(inpx,inpy,inlev,y%tl_idx)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%w_i(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%w_i(inpx,inpy,inlev,y%tl_idx)
-                z%elem(ie)%state%phinh_i(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx)* &
-                     y%elem(ie)%state%phinh_i(inpx,inpy,inlev,y%tl_idx)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    do ie = z%nets, z%nete
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%v(inpx, inpy, 1, inlev, z%tl_idx) = &
+              x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx)* &
+              y%elem(ie)%state%v(inpx, inpy, 1, inlev, y%tl_idx)
+            z%elem(ie)%state%v(inpx, inpy, 2, inlev, z%tl_idx) = &
+              x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx)* &
+              y%elem(ie)%state%v(inpx, inpy, 2, inlev, y%tl_idx)
+            z%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx)* &
+              y%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, y%tl_idx)
+            z%elem(ie)%state%dp3d(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx)* &
+              y%elem(ie)%state%dp3d(inpx, inpy, inlev, y%tl_idx)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%w_i(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx)* &
+              y%elem(ie)%state%w_i(inpx, inpy, inlev, y%tl_idx)
+            z%elem(ie)%state%phinh_i(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx)* &
+              y%elem(ie)%state%phinh_i(inpx, inpy, inlev, y%tl_idx)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     return
@@ -634,37 +634,37 @@ contains
     z => FN_VGetContent(sunvec_z)
 
     ! perform vector operation
-    do ie=z%nets,z%nete
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%v(inpx,inpy,1,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx)/ &
-                     y%elem(ie)%state%v(inpx,inpy,1,inlev,y%tl_idx)
-                z%elem(ie)%state%v(inpx,inpy,2,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx)/ &
-                     y%elem(ie)%state%v(inpx,inpy,2,inlev,y%tl_idx)
-                z%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx)/ &
-                     y%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,y%tl_idx)
-                z%elem(ie)%state%dp3d(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx)/ &
-                     y%elem(ie)%state%dp3d(inpx,inpy,inlev,y%tl_idx)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%w_i(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx)/ &
-                     y%elem(ie)%state%w_i(inpx,inpy,inlev,y%tl_idx)
-                z%elem(ie)%state%phinh_i(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx)/ &
-                     y%elem(ie)%state%phinh_i(inpx,inpy,inlev,y%tl_idx)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    do ie = z%nets, z%nete
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%v(inpx, inpy, 1, inlev, z%tl_idx) = &
+              x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx)/ &
+              y%elem(ie)%state%v(inpx, inpy, 1, inlev, y%tl_idx)
+            z%elem(ie)%state%v(inpx, inpy, 2, inlev, z%tl_idx) = &
+              x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx)/ &
+              y%elem(ie)%state%v(inpx, inpy, 2, inlev, y%tl_idx)
+            z%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx)/ &
+              y%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, y%tl_idx)
+            z%elem(ie)%state%dp3d(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx)/ &
+              y%elem(ie)%state%dp3d(inpx, inpy, inlev, y%tl_idx)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%w_i(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx)/ &
+              y%elem(ie)%state%w_i(inpx, inpy, inlev, y%tl_idx)
+            z%elem(ie)%state%phinh_i(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx)/ &
+              y%elem(ie)%state%phinh_i(inpx, inpy, inlev, y%tl_idx)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     return
@@ -698,31 +698,31 @@ contains
     z => FN_VGetContent(sunvec_z)
 
     ! perform vector operation
-    do ie=z%nets,z%nete
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%v(inpx,inpy,1,inlev,z%tl_idx) = &
-                     cval * x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx)
-                z%elem(ie)%state%v(inpx,inpy,2,inlev,z%tl_idx) = &
-                     cval * x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx)
-                z%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,z%tl_idx) = &
-                     cval * x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx)
-                z%elem(ie)%state%dp3d(inpx,inpy,inlev,z%tl_idx) = &
-                     cval * x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%w_i(inpx,inpy,inlev,z%tl_idx) = &
-                     cval * x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx)
-                z%elem(ie)%state%phinh_i(inpx,inpy,inlev,z%tl_idx) = &
-                     cval * x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    do ie = z%nets, z%nete
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%v(inpx, inpy, 1, inlev, z%tl_idx) = &
+              cval*x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx)
+            z%elem(ie)%state%v(inpx, inpy, 2, inlev, z%tl_idx) = &
+              cval*x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx)
+            z%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, z%tl_idx) = &
+              cval*x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx)
+            z%elem(ie)%state%dp3d(inpx, inpy, inlev, z%tl_idx) = &
+              cval*x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%w_i(inpx, inpy, inlev, z%tl_idx) = &
+              cval*x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx)
+            z%elem(ie)%state%phinh_i(inpx, inpy, inlev, z%tl_idx) = &
+              cval*x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     return
@@ -755,31 +755,31 @@ contains
     z => FN_VGetContent(sunvec_z)
 
     ! perform vector operation
-    do ie=z%nets,z%nete
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%v(inpx,inpy,1,inlev,z%tl_idx) = &
-                     abs(x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx))
-                z%elem(ie)%state%v(inpx,inpy,2,inlev,z%tl_idx) = &
-                     abs(x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx))
-                z%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,z%tl_idx) = &
-                     abs(x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx))
-                z%elem(ie)%state%dp3d(inpx,inpy,inlev,z%tl_idx) = &
-                     abs(x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx))
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%w_i(inpx,inpy,inlev,z%tl_idx) = &
-                     abs(x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx))
-                z%elem(ie)%state%phinh_i(inpx,inpy,inlev,z%tl_idx) = &
-                     abs(x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx))
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    do ie = z%nets, z%nete
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%v(inpx, inpy, 1, inlev, z%tl_idx) = &
+              abs(x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx))
+            z%elem(ie)%state%v(inpx, inpy, 2, inlev, z%tl_idx) = &
+              abs(x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx))
+            z%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, z%tl_idx) = &
+              abs(x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx))
+            z%elem(ie)%state%dp3d(inpx, inpy, inlev, z%tl_idx) = &
+              abs(x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx))
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%w_i(inpx, inpy, inlev, z%tl_idx) = &
+              abs(x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx))
+            z%elem(ie)%state%phinh_i(inpx, inpy, inlev, z%tl_idx) = &
+              abs(x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx))
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     return
@@ -812,31 +812,31 @@ contains
     z => FN_VGetContent(sunvec_z)
 
     ! perform vector operation
-    do ie=z%nets,z%nete
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%v(inpx,inpy,1,inlev,z%tl_idx) = &
-                     1.d0 / x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx)
-                z%elem(ie)%state%v(inpx,inpy,2,inlev,z%tl_idx) = &
-                     1.d0 / x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx)
-                z%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,z%tl_idx) = &
-                     1.d0 / x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx)
-                z%elem(ie)%state%dp3d(inpx,inpy,inlev,z%tl_idx) = &
-                     1.d0 / x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%w_i(inpx,inpy,inlev,z%tl_idx) = &
-                     1.d0 / x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx)
-                z%elem(ie)%state%phinh_i(inpx,inpy,inlev,z%tl_idx) = &
-                     1.d0 / x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    do ie = z%nets, z%nete
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%v(inpx, inpy, 1, inlev, z%tl_idx) = &
+              1.d0/x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx)
+            z%elem(ie)%state%v(inpx, inpy, 2, inlev, z%tl_idx) = &
+              1.d0/x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx)
+            z%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, z%tl_idx) = &
+              1.d0/x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx)
+            z%elem(ie)%state%dp3d(inpx, inpy, inlev, z%tl_idx) = &
+              1.d0/x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%w_i(inpx, inpy, inlev, z%tl_idx) = &
+              1.d0/x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx)
+            z%elem(ie)%state%phinh_i(inpx, inpy, inlev, z%tl_idx) = &
+              1.d0/x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     return
@@ -870,31 +870,31 @@ contains
     z => FN_VGetContent(sunvec_z)
 
     ! perform vector operation
-    do ie=z%nets,z%nete
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%v(inpx,inpy,1,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx) + cval
-                z%elem(ie)%state%v(inpx,inpy,2,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx) + cval
-                z%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx) + cval
-                z%elem(ie)%state%dp3d(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx) + cval
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                z%elem(ie)%state%w_i(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx) + cval
-                z%elem(ie)%state%phinh_i(inpx,inpy,inlev,z%tl_idx) = &
-                     x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx) + cval
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    do ie = z%nets, z%nete
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%v(inpx, inpy, 1, inlev, z%tl_idx) = &
+              x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx) + cval
+            z%elem(ie)%state%v(inpx, inpy, 2, inlev, z%tl_idx) = &
+              x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx) + cval
+            z%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx) + cval
+            z%elem(ie)%state%dp3d(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx) + cval
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            z%elem(ie)%state%w_i(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx) + cval
+            z%elem(ie)%state%phinh_i(inpx, inpy, inlev, z%tl_idx) = &
+              x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx) + cval
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     return
@@ -909,9 +909,9 @@ contains
     !---------------------------------------------------------------------------
     use, intrinsic :: iso_c_binding
 
-    use dimensions_mod,   only: np, nlev, nlevp
-    use MPI,              only: MPI_MAX
-    use parallel_mod,     only: MPIreal_t
+    use dimensions_mod, only: np, nlev, nlevp
+    use MPI, only: MPI_MAX
+    use parallel_mod, only: MPIreal_t
 
     implicit none
     type(N_Vector)             :: sunvec_x
@@ -929,33 +929,33 @@ contains
     ! NOTE: we do not use spheremp here since we want the 'max'
     ! and all 'inactive' data are just duplicates of 'active' data
     cval_loc = 0.d0
-    do ie=x%nets,x%nete
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                cval_loc = max(cval_loc, &
-                     abs(x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx)), &
-                     abs(x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx)), &
-                     abs(x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx)), &
-                     abs(x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx)))
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                cval_loc = max(cval_loc, &
-                     abs(x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx)), &
-                     abs(x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx)))
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    do ie = x%nets, x%nete
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            cval_loc = max(cval_loc, &
+                           abs(x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx)), &
+                           abs(x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx)), &
+                           abs(x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx)), &
+                           abs(x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx)))
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            cval_loc = max(cval_loc, &
+                           abs(x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx)), &
+                           abs(x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx)))
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     ! accumulate in a local "double precision" variable
     ! just to be safe, and then copy to cval
     call MPI_Allreduce(cval_loc, cval_max, 1, MPIreal_t, &
-         MPI_MAX, par_ptr%comm, ie)
+                       MPI_MAX, par_ptr%comm, ie)
     cval = cval_max
 
     return
@@ -965,16 +965,16 @@ contains
   !=============================================================================
 
   real(c_double) function FN_VWrmsNorm_HOMME(sunvec_x, sunvec_w) &
-       result(cval) bind(C)
+    result(cval) bind(C)
     !---------------------------------------------------------------------------
     ! cval = sqrt( sum_i smp(i)*[x(i)*w(i)]^2 / [4*pi*6*nlev] )
     !---------------------------------------------------------------------------
     use, intrinsic :: iso_c_binding
 
-    use dimensions_mod,     only: np, nlev, nlevp
+    use dimensions_mod, only: np, nlev, nlevp
     use physical_constants, only: dd_pi
-    use parallel_mod,       only: abortmp, global_shared_buf, global_shared_sum
-    use global_norms_mod,   only: wrap_repro_sum
+    use parallel_mod, only: abortmp, global_shared_buf, global_shared_sum
+    use global_norms_mod, only: wrap_repro_sum
 
     implicit none
     type(N_Vector), intent(in)  :: sunvec_x
@@ -995,38 +995,38 @@ contains
     ! duplicated, in that the sum including spheremp performs the
     ! integral over the domain.  We also use the fact that the overall
     ! spherical domain has area 4*pi
-    do ie=x%nets,x%nete
-       global_shared_buf(ie,1) = 0.d0
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                global_shared_buf(ie,1) = global_shared_buf(ie,1) + &
-                     ( &
-                     (x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx)* &
-                     w%elem(ie)%state%v(inpx,inpy,1,inlev,w%tl_idx))**2 + &
-                     (x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx)* &
-                     w%elem(ie)%state%v(inpx,inpy,2,inlev,w%tl_idx))**2 + &
-                     (x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx)* &
-                     w%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,w%tl_idx))**2 + &
-                     (x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx)* &
-                     w%elem(ie)%state%dp3d(inpx,inpy,inlev,w%tl_idx))**2 &
-                     ) * x%elem(ie)%spheremp(inpx,inpy)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                global_shared_buf(ie,1) = global_shared_buf(ie,1) + &
-                     ( &
-                     (x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx)* &
-                     w%elem(ie)%state%w_i(inpx,inpy,inlev,w%tl_idx))**2 + &
-                     (x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx)* &
-                     w%elem(ie)%state%phinh_i(inpx,inpy,inlev,w%tl_idx))**2 &
-                     ) * x%elem(ie)%spheremp(inpx,inpy)
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    do ie = x%nets, x%nete
+      global_shared_buf(ie, 1) = 0.d0
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            global_shared_buf(ie, 1) = global_shared_buf(ie, 1) + &
+                                       ( &
+                                       (x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx)* &
+                                        w%elem(ie)%state%v(inpx, inpy, 1, inlev, w%tl_idx))**2 + &
+                                       (x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx)* &
+                                        w%elem(ie)%state%v(inpx, inpy, 2, inlev, w%tl_idx))**2 + &
+                                       (x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx)* &
+                                        w%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, w%tl_idx))**2 + &
+                                       (x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx)* &
+                                        w%elem(ie)%state%dp3d(inpx, inpy, inlev, w%tl_idx))**2 &
+                                       )*x%elem(ie)%spheremp(inpx, inpy)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            global_shared_buf(ie, 1) = global_shared_buf(ie, 1) + &
+                                       ( &
+                                       (x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx)* &
+                                        w%elem(ie)%state%w_i(inpx, inpy, inlev, w%tl_idx))**2 + &
+                                       (x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx)* &
+                                        w%elem(ie)%state%phinh_i(inpx, inpy, inlev, w%tl_idx))**2 &
+                                       )*x%elem(ie)%spheremp(inpx, inpy)
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     ! accumulate sum using wrap_repro_sum and then copy to cval and divide
@@ -1034,7 +1034,7 @@ contains
     ! then ||x_C||_wrms < 1 implies that alpha < beta, because
     ! sum_i smp(i)*[x(i)*w(i)]^2 = 4*pi*(nlev*6+2)*alpha^2/beta^2)
     call wrap_repro_sum(nvars=1, comm=par_ptr%comm)
-    cval = sqrt(global_shared_sum(1)/(4.d0*dd_pi*(6.d0*nlev+2.d0)))
+    cval = sqrt(global_shared_sum(1)/(4.d0*dd_pi*(6.d0*nlev + 2.d0)))
 
     return
 
@@ -1048,9 +1048,9 @@ contains
     !---------------------------------------------------------------------------
     use, intrinsic :: iso_c_binding
 
-    use dimensions_mod,   only: np, nlev, nlevp
-    use MPI,              only: MPI_MIN
-    use parallel_mod,     only: MPIreal_t
+    use dimensions_mod, only: np, nlev, nlevp
+    use MPI, only: MPI_MIN
+    use parallel_mod, only: MPIreal_t
 
     implicit none
     type(N_Vector)             :: sunvec_x
@@ -1067,34 +1067,34 @@ contains
 
     ! NOTE: we do not use spheremp here since we want the 'min'
     ! and all 'inactive' data are just duplicates of 'active' data
-    cval_loc = abs(x%elem(x%nets)%state%v(1,1,1,1,x%tl_idx))
-    do ie=x%nets,x%nete
-       do inlev=1,nlev
-          do inpy=1,np
-             do inpx=1,np
-                cval_loc = min(cval_loc, &
-                     abs(x%elem(ie)%state%v(inpx,inpy,1,inlev,x%tl_idx)), &
-                     abs(x%elem(ie)%state%v(inpx,inpy,2,inlev,x%tl_idx)), &
-                     abs(x%elem(ie)%state%vtheta_dp(inpx,inpy,inlev,x%tl_idx)), &
-                     abs(x%elem(ie)%state%dp3d(inpx,inpy,inlev,x%tl_idx)))
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
-       do inlev=1,nlevp
-          do inpy=1,np
-             do inpx=1,np
-                cval_loc = min(cval_loc, &
-                     abs(x%elem(ie)%state%w_i(inpx,inpy,inlev,x%tl_idx)), &
-                     abs(x%elem(ie)%state%phinh_i(inpx,inpy,inlev,x%tl_idx)))
-             end do ! inpx
-          end do ! inpy
-       end do ! inlev
+    cval_loc = abs(x%elem(x%nets)%state%v(1, 1, 1, 1, x%tl_idx))
+    do ie = x%nets, x%nete
+      do inlev = 1, nlev
+        do inpy = 1, np
+          do inpx = 1, np
+            cval_loc = min(cval_loc, &
+                           abs(x%elem(ie)%state%v(inpx, inpy, 1, inlev, x%tl_idx)), &
+                           abs(x%elem(ie)%state%v(inpx, inpy, 2, inlev, x%tl_idx)), &
+                           abs(x%elem(ie)%state%vtheta_dp(inpx, inpy, inlev, x%tl_idx)), &
+                           abs(x%elem(ie)%state%dp3d(inpx, inpy, inlev, x%tl_idx)))
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
+      do inlev = 1, nlevp
+        do inpy = 1, np
+          do inpx = 1, np
+            cval_loc = min(cval_loc, &
+                           abs(x%elem(ie)%state%w_i(inpx, inpy, inlev, x%tl_idx)), &
+                           abs(x%elem(ie)%state%phinh_i(inpx, inpy, inlev, x%tl_idx)))
+          end do ! inpx
+        end do ! inpy
+      end do ! inlev
     end do ! ie
 
     ! accumulate in a local "double precision" variable
     ! just to be safe, and then copy to cval
     call MPI_Allreduce(cval_loc, cval_min, 1, MPIreal_t, &
-         MPI_MIN, par_ptr%comm, ie)
+                       MPI_MIN, par_ptr%comm, ie)
     cval = cval_min
 
     return

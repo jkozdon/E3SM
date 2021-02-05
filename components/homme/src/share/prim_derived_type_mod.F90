@@ -4,27 +4,27 @@
 
 module prim_derived_type_mod
 
-   use kinds, only : real_kind
-   use element_mod, only : element_t
-   use hybvcoord_mod, only : hvcoord_t
-   use hybrid_mod, only : hybrid_t
-   use derivative_mod, only : derivative_t
-   use time_mod, only : TimeLevel_t
+  use kinds, only: real_kind
+  use element_mod, only: element_t
+  use hybvcoord_mod, only: hvcoord_t
+  use hybrid_mod, only: hybrid_t
+  use derivative_mod, only: derivative_t
+  use time_mod, only: TimeLevel_t
 
-   implicit none
+  implicit none
 
-  type ,public :: derived_type
+  type, public :: derived_type
 
     integer                 :: method
-    type (element_t)      ,allocatable ,dimension(:) :: base
-    type (hvcoord_t)        :: hvcoord
-    type (hybrid_t)         :: hybrid
+    type(element_t), allocatable, dimension(:) :: base
+    type(hvcoord_t)        :: hvcoord
+    type(hybrid_t)         :: hybrid
     logical                 :: compute_diagnostics
     integer                 :: n_Q
-    real (kind=real_kind)   :: eta_ave_w
-    type (derivative_t)     :: deriv
-    real (kind=real_kind)   :: dt
-    type (TimeLevel_t)      :: tl
+    real(kind=real_kind)   :: eta_ave_w
+    type(derivative_t)     :: deriv
+    real(kind=real_kind)   :: dt
+    type(TimeLevel_t)      :: tl
     integer                 :: nets
     integer                 :: nete
 
@@ -53,50 +53,50 @@ module prim_derived_type_mod
 !
 !  end type precon_type
 
- contains
+contains
   subroutine initialize(object, method, elem, hvcoord, compute_diagnostics, &
-           n_Q, eta_ave_w, hybrid, deriv, dt, tl, nets, nete)
+                        n_Q, eta_ave_w, hybrid, deriv, dt, tl, nets, nete)
 
-   use kinds, only : real_kind
-   use element_mod, only : element_t
-   use hybvcoord_mod, only : hvcoord_t
-   use hybrid_mod, only : hybrid_t
-   use derivative_mod, only : derivative_t
-   use time_mod, only : TimeLevel_t
+    use kinds, only: real_kind
+    use element_mod, only: element_t
+    use hybvcoord_mod, only: hvcoord_t
+    use hybrid_mod, only: hybrid_t
+    use derivative_mod, only: derivative_t
+    use time_mod, only: TimeLevel_t
 
-   implicit none 
+    implicit none
 
     integer :: ie
 
-    integer                ,intent(in)  :: method
-    integer                ,intent(in)  :: nets
-    integer                ,intent(in)  :: nete
-    type (element_t)       ,intent(in)  :: elem(nets:nete)
-    type (hvcoord_t)       ,intent(in)  :: hvcoord
-    type (hybrid_t)        ,intent(in)  :: hybrid
-    logical                ,intent(in)  :: compute_diagnostics
-    integer                ,intent(in)  :: n_Q
-    real (kind=real_kind)  ,intent(in)  :: eta_ave_w
-    type (derivative_t)    ,intent(in)  :: deriv
-    real (kind=real_kind)  ,intent(in)  :: dt
-    type (TimeLevel_t)     ,intent(in)  :: tl
-    type(derived_type)     ,intent(out) :: object
+    integer, intent(in)  :: method
+    integer, intent(in)  :: nets
+    integer, intent(in)  :: nete
+    type(element_t), intent(in)  :: elem(nets:nete)
+    type(hvcoord_t), intent(in)  :: hvcoord
+    type(hybrid_t), intent(in)  :: hybrid
+    logical, intent(in)  :: compute_diagnostics
+    integer, intent(in)  :: n_Q
+    real(kind=real_kind), intent(in)  :: eta_ave_w
+    type(derivative_t), intent(in)  :: deriv
+    real(kind=real_kind), intent(in)  :: dt
+    type(TimeLevel_t), intent(in)  :: tl
+    type(derived_type), intent(out) :: object
 
-   allocate(object%base(nets:nete))
-   object%method = method
-    do ie=nets,nete
-   object%base(ie)= elem(ie)
+    allocate (object%base(nets:nete))
+    object%method = method
+    do ie = nets, nete
+      object%base(ie) = elem(ie)
     end do
-   object%hvcoord = hvcoord
-   object%hybrid = hybrid
-   object%compute_diagnostics = compute_diagnostics
-   object%n_Q = n_Q
-   object%eta_ave_w = eta_ave_w
-   object%deriv = deriv
-   object%dt = dt
-   object%tl = tl
-   object%nets = nets
-   object%nete = nete
+    object%hvcoord = hvcoord
+    object%hybrid = hybrid
+    object%compute_diagnostics = compute_diagnostics
+    object%n_Q = n_Q
+    object%eta_ave_w = eta_ave_w
+    object%deriv = deriv
+    object%dt = dt
+    object%tl = tl
+    object%nets = nets
+    object%nete = nete
 
   end subroutine initialize
 
@@ -114,7 +114,7 @@ module prim_derived_type_mod
 !   use hybrid_mod, only : hybrid_t
 !   use prim_si_ref_mod, only : ref_state_t
 
-!   implicit none 
+!   implicit none
 
 !    integer :: ie, k
 

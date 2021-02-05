@@ -6,19 +6,19 @@ module thread_mod
 
 #ifdef _OPENMP
   use omp_lib, only: omp_get_thread_num, &
-       omp_in_parallel, &
-       omp_set_num_threads, &
-       omp_get_max_threads, &
-       omp_get_num_threads, &
-       omp_get_nested
+                     omp_in_parallel, &
+                     omp_set_num_threads, &
+                     omp_get_max_threads, &
+                     omp_get_num_threads, &
+                     omp_get_nested
 #endif
 
   implicit none
   private
 
   integer, public :: NThreads   ! total number of threads
-                                ! standalone HOMME: from namelist
-                                ! in CAM: set by driver
+  ! standalone HOMME: from namelist
+  ! in CAM: set by driver
   integer, public :: hthreads   ! computed based on nthreads, vthreads,nelemd
   integer, public :: vthreads = 1   ! not used unless set in namelist
 
@@ -33,30 +33,30 @@ contains
 
   function omp_get_thread_num() result(ithr)
     integer ithr
-    ithr=0
+    ithr = 0
   end function omp_get_thread_num
 
   function omp_get_num_threads() result(ithr)
     integer ithr
-    ithr=1
+    ithr = 1
   end function omp_get_num_threads
 
   function omp_in_parallel() result(ans)
     logical ans
-    ans=.FALSE.
+    ans = .FALSE.
   end function omp_in_parallel
 
   subroutine omp_set_num_threads(NThreads)
     integer Nthreads
-    NThreads=1
+    NThreads = 1
   end subroutine omp_set_num_threads
 
   integer function omp_get_max_threads()
-    omp_get_max_threads=1
+    omp_get_max_threads = 1
   end function omp_get_max_threads
 
   integer function omp_get_nested()
-    omp_get_nested=0
+    omp_get_nested = 0
   end function omp_get_nested
 
 #endif

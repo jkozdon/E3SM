@@ -46,7 +46,7 @@
 !    mapSet method is called, the mapData method can be used.
 !    \newline
 !    A Note on Subroutine Arguments:
-!    Lat, lon, and mask arguments in these routines are 2d (nx,ny) 
+!    Lat, lon, and mask arguments in these routines are 2d (nx,ny)
 !    Array arguments are 2d (nf,nxy), number of fields by grid point
 !    \newline
 !    General Usage:
@@ -88,21 +88,21 @@ module shr_map_mod
 
   type shr_map_mapType                       ! like mct sparsematrix datatype
     private
-    character(SHR_KIND_CS)       :: name 
-    character(SHR_KIND_CS)       :: type 
+    character(SHR_KIND_CS)       :: name
+    character(SHR_KIND_CS)       :: type
     character(SHR_KIND_CS)       :: algo
     character(SHR_KIND_CS)       :: mask
     character(SHR_KIND_CS)       :: vect
     integer(SHR_KIND_IN)         :: nsrc     ! grid size or src
     integer(SHR_KIND_IN)         :: ndst     ! grid size of dst
     integer(SHR_KIND_IN)         :: nwts     ! number of total weights
-    real(SHR_KIND_R8)   ,pointer :: xsrc(:)  ! longitude, for vector, rad
-    real(SHR_KIND_R8)   ,pointer :: ysrc(:)  ! latitude , for vector, rad
-    real(SHR_KIND_R8)   ,pointer :: xdst(:)  ! longitude, for vector, rad
-    real(SHR_KIND_R8)   ,pointer :: ydst(:)  ! latitude , for vector, rad
-    real(SHR_KIND_R8)   ,pointer :: wgts(:)  ! weights
-    integer(SHR_KIND_IN),pointer :: isrc(:)  ! input grid index
-    integer(SHR_KIND_IN),pointer :: idst(:)  ! output grid index
+    real(SHR_KIND_R8), pointer :: xsrc(:)  ! longitude, for vector, rad
+    real(SHR_KIND_R8), pointer :: ysrc(:)  ! latitude , for vector, rad
+    real(SHR_KIND_R8), pointer :: xdst(:)  ! longitude, for vector, rad
+    real(SHR_KIND_R8), pointer :: ydst(:)  ! latitude , for vector, rad
+    real(SHR_KIND_R8), pointer :: wgts(:)  ! weights
+    integer(SHR_KIND_IN), pointer :: isrc(:)  ! input grid index
+    integer(SHR_KIND_IN), pointer :: idst(:)  ! output grid index
     character(SHR_KIND_CS)       :: fill     ! string to check if filled
   end type shr_map_mapType
 
@@ -123,98 +123,98 @@ module shr_map_mod
 ! PUBLIC DATA MEMBERS:
 
   !--- Field Strings (fldStr) ---
-  character(SHR_KIND_CS),public,parameter :: shr_map_fs_name  = 'name'
-  character(SHR_KIND_CS),public,parameter :: shr_map_fs_type  = 'type'
-  character(SHR_KIND_CS),public,parameter :: shr_map_fs_algo  = 'algo'
-  character(SHR_KIND_CS),public,parameter :: shr_map_fs_mask  = 'mask'
-  character(SHR_KIND_CS),public,parameter :: shr_map_fs_vect  = 'vect'
-  character(SHR_KIND_CS),public,parameter :: shr_map_fs_nwts  = 'nwts'
-  character(SHR_KIND_CS),public,parameter :: shr_map_fs_nsrc  = 'nsrc'
-  character(SHR_KIND_CS),public,parameter :: shr_map_fs_ndst  = 'ndst'
+  character(SHR_KIND_CS), public, parameter :: shr_map_fs_name = 'name'
+  character(SHR_KIND_CS), public, parameter :: shr_map_fs_type = 'type'
+  character(SHR_KIND_CS), public, parameter :: shr_map_fs_algo = 'algo'
+  character(SHR_KIND_CS), public, parameter :: shr_map_fs_mask = 'mask'
+  character(SHR_KIND_CS), public, parameter :: shr_map_fs_vect = 'vect'
+  character(SHR_KIND_CS), public, parameter :: shr_map_fs_nwts = 'nwts'
+  character(SHR_KIND_CS), public, parameter :: shr_map_fs_nsrc = 'nsrc'
+  character(SHR_KIND_CS), public, parameter :: shr_map_fs_ndst = 'ndst'
 
   !--- "type" options ---
-  character(len=*),public,parameter :: shr_map_fs_fill     = 'fill    '
-  character(len=*),public,parameter :: shr_map_fs_remap    = 'remap   '
+  character(len=*), public, parameter :: shr_map_fs_fill = 'fill    '
+  character(len=*), public, parameter :: shr_map_fs_remap = 'remap   '
 
   !--- "algorithm" options ---
-  character(len=*),public,parameter :: shr_map_fs_copy     = 'copy    '
-  character(len=*),public,parameter :: shr_map_fs_bilinear = 'bilinear'
-  character(len=*),public,parameter :: shr_map_fs_nn       = 'nn      '
-  character(len=*),public,parameter :: shr_map_fs_nnoni    = 'nnoni   '
-  character(len=*),public,parameter :: shr_map_fs_nnonj    = 'nnonj   '
-  character(len=*),public,parameter :: shr_map_fs_spval    = 'spval   '
+  character(len=*), public, parameter :: shr_map_fs_copy = 'copy    '
+  character(len=*), public, parameter :: shr_map_fs_bilinear = 'bilinear'
+  character(len=*), public, parameter :: shr_map_fs_nn = 'nn      '
+  character(len=*), public, parameter :: shr_map_fs_nnoni = 'nnoni   '
+  character(len=*), public, parameter :: shr_map_fs_nnonj = 'nnonj   '
+  character(len=*), public, parameter :: shr_map_fs_spval = 'spval   '
 
   !--- "mask" options ---
-  character(len=*),public,parameter :: shr_map_fs_srcmask  = 'srcmask '
-  character(len=*),public,parameter :: shr_map_fs_dstmask  = 'dstmask '
-  character(len=*),public,parameter :: shr_map_fs_nomask   = 'nomask  '
-  character(len=*),public,parameter :: shr_map_fs_bothmask = 'bothmask'
+  character(len=*), public, parameter :: shr_map_fs_srcmask = 'srcmask '
+  character(len=*), public, parameter :: shr_map_fs_dstmask = 'dstmask '
+  character(len=*), public, parameter :: shr_map_fs_nomask = 'nomask  '
+  character(len=*), public, parameter :: shr_map_fs_bothmask = 'bothmask'
 
   !--- "vect" options ---
-  character(len=*),public,parameter :: shr_map_fs_scalar   = 'scalar  '
-  character(len=*),public,parameter :: shr_map_fs_vector   = 'vector  '
+  character(len=*), public, parameter :: shr_map_fs_scalar = 'scalar  '
+  character(len=*), public, parameter :: shr_map_fs_vector = 'vector  '
 
   !--- other public parameters ---
-  character(SHR_KIND_CS),public,parameter :: shr_map_setTru = 'TRUE map'
-  character(SHR_KIND_CS),public,parameter :: shr_map_setFal = 'FALSE m '
-  integer(SHR_KIND_IN)  ,public,parameter :: shr_map_ispval = -99
-  real(SHR_KIND_R8)     ,public,parameter :: shr_map_spval  = shr_const_spval
+  character(SHR_KIND_CS), public, parameter :: shr_map_setTru = 'TRUE map'
+  character(SHR_KIND_CS), public, parameter :: shr_map_setFal = 'FALSE m '
+  integer(SHR_KIND_IN), public, parameter :: shr_map_ispval = -99
+  real(SHR_KIND_R8), public, parameter :: shr_map_spval = shr_const_spval
 
 !EOP
 
   !--- Must update these if anything above changes ---
-  integer(SHR_KIND_IN),public,parameter :: shr_map_fs_ntype = 2
-  character(len=*),public,parameter :: &
-  shr_map_fs_types(shr_map_fs_ntype) = (/shr_map_fs_fill, &
-                                         shr_map_fs_remap /)
+  integer(SHR_KIND_IN), public, parameter :: shr_map_fs_ntype = 2
+  character(len=*), public, parameter :: &
+    shr_map_fs_types(shr_map_fs_ntype) = (/shr_map_fs_fill, &
+                                           shr_map_fs_remap/)
 
-  integer(SHR_KIND_IN),public,parameter :: shr_map_fs_nalgo = 6
-  character(len=*),public,parameter :: &
-  shr_map_fs_algos(shr_map_fs_nalgo) = (/shr_map_fs_copy, &
-                                         shr_map_fs_bilinear, &
-                                         shr_map_fs_nn, &
-                                         shr_map_fs_nnoni, &
-                                         shr_map_fs_nnonj, &
-                                         shr_map_fs_spval  /)
+  integer(SHR_KIND_IN), public, parameter :: shr_map_fs_nalgo = 6
+  character(len=*), public, parameter :: &
+    shr_map_fs_algos(shr_map_fs_nalgo) = (/shr_map_fs_copy, &
+                                           shr_map_fs_bilinear, &
+                                           shr_map_fs_nn, &
+                                           shr_map_fs_nnoni, &
+                                           shr_map_fs_nnonj, &
+                                           shr_map_fs_spval/)
 
-  integer(SHR_KIND_IN),public,parameter :: shr_map_fs_nmask = 4
-  character(len=*),public,parameter :: &
-  shr_map_fs_masks(shr_map_fs_nmask) = (/shr_map_fs_srcmask, &
-                                         shr_map_fs_dstmask, &
-                                         shr_map_fs_nomask , &
-                                         shr_map_fs_bothmask /)
+  integer(SHR_KIND_IN), public, parameter :: shr_map_fs_nmask = 4
+  character(len=*), public, parameter :: &
+    shr_map_fs_masks(shr_map_fs_nmask) = (/shr_map_fs_srcmask, &
+                                           shr_map_fs_dstmask, &
+                                           shr_map_fs_nomask, &
+                                           shr_map_fs_bothmask/)
 
-  integer(SHR_KIND_IN),public,parameter :: shr_map_fs_nvect = 2
-  character(len=*),public,parameter :: &
-  shr_map_fs_vects(shr_map_fs_nvect) = (/shr_map_fs_scalar, &
-                                         shr_map_fs_vector /)
+  integer(SHR_KIND_IN), public, parameter :: shr_map_fs_nvect = 2
+  character(len=*), public, parameter :: &
+    shr_map_fs_vects(shr_map_fs_nvect) = (/shr_map_fs_scalar, &
+                                           shr_map_fs_vector/)
 
-  interface shr_map_put ; module procedure &
-    shr_map_putCS, &
-    shr_map_putR8, &
-    shr_map_putIN
+  interface shr_map_put; module procedure &
+ shr_map_putCS, &
+ shr_map_putR8, &
+ shr_map_putIN
   end interface
 
-  interface shr_map_get ; module procedure &
-    shr_map_getCS, &
-    shr_map_getR8, &
-    shr_map_getIN
+  interface shr_map_get; module procedure &
+ shr_map_getCS, &
+ shr_map_getR8, &
+ shr_map_getIN
   end interface
 
-  interface shr_map_mapData ; module procedure &
-    shr_map_mapDatam, &
-    shr_map_mapDatanm
+  interface shr_map_mapData; module procedure &
+ shr_map_mapDatam, &
+ shr_map_mapDatanm
   end interface
 
-  logical,save                   :: doabort = .true.
-  logical,save                   :: dopole  = .true.   ! for bilinear
-  integer(SHR_KIND_IN),save      :: debug = 0
-  character(SHR_KIND_CS),parameter :: fillstring = 'mapisfilled'
-  real(SHR_KIND_R8)   ,parameter :: c0  = 0._SHR_KIND_R8
-  real(SHR_KIND_R8)   ,parameter :: c1  = 1._SHR_KIND_R8
-  real(SHR_KIND_R8)   ,parameter :: c2  = 2._SHR_KIND_R8
-  real(SHR_KIND_R8)   ,parameter :: eps = 1.0e-12_SHR_KIND_R8
-  real(SHR_KIND_R8)   ,parameter :: pi  = shr_const_pi
+  logical, save                   :: doabort = .true.
+  logical, save                   :: dopole = .true.   ! for bilinear
+  integer(SHR_KIND_IN), save      :: debug = 0
+  character(SHR_KIND_CS), parameter :: fillstring = 'mapisfilled'
+  real(SHR_KIND_R8), parameter :: c0 = 0._SHR_KIND_R8
+  real(SHR_KIND_R8), parameter :: c1 = 1._SHR_KIND_R8
+  real(SHR_KIND_R8), parameter :: c2 = 2._SHR_KIND_R8
+  real(SHR_KIND_R8), parameter :: eps = 1.0e-12_SHR_KIND_R8
+  real(SHR_KIND_R8), parameter :: pi = shr_const_pi
 
 !===============================================================================
 contains
@@ -234,32 +234,32 @@ contains
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-logical function shr_map_checkInit(map)
+  logical function shr_map_checkInit(map)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType),intent(in) :: map
+    type(shr_map_mapType), intent(in) :: map
 
 !EOP
 
-  !--- local ---
+    !--- local ---
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_checkInit') "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_checkInit') "
 
 !-------------------------------------------------------------------------------
 
-  if (shr_map_checkFldStrOpt(shr_map_fs_type,map%type) .and. &
-      shr_map_checkFldStrOpt(shr_map_fs_algo,map%algo) .and. &
-      shr_map_checkFldStrOpt(shr_map_fs_mask,map%mask)) then
-    shr_map_checkInit = .true.
-  else
-    shr_map_checkInit = .false.
-  endif
+    if (shr_map_checkFldStrOpt(shr_map_fs_type, map%type) .and. &
+        shr_map_checkFldStrOpt(shr_map_fs_algo, map%algo) .and. &
+        shr_map_checkFldStrOpt(shr_map_fs_mask, map%mask)) then
+      shr_map_checkInit = .true.
+    else
+      shr_map_checkInit = .false.
+    end if
 
-end function shr_map_checkInit
+  end function shr_map_checkInit
 
 !===============================================================================
 !BOP ===========================================================================
@@ -279,35 +279,35 @@ end function shr_map_checkInit
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-logical function shr_map_checkFilled(map)
+  logical function shr_map_checkFilled(map)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType),intent(in) :: map
+    type(shr_map_mapType), intent(in) :: map
 
 !EOP
 
-  !--- local ---
-  integer(SHR_KIND_IN) :: nwts
+    !--- local ---
+    integer(SHR_KIND_IN) :: nwts
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_checkFilled') "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_checkFilled') "
 
 !-------------------------------------------------------------------------------
 
-  shr_map_checkFilled = .false.
+    shr_map_checkFilled = .false.
 
-  nwts = map%nwts
-  if (map%fill == fillstring .and. nwts > 0) then
-     if (size(map%wgts) == nwts .and. size(map%isrc) == nwts &
-                                .and. size(map%idst) == nwts ) then
+    nwts = map%nwts
+    if (map%fill == fillstring .and. nwts > 0) then
+      if (size(map%wgts) == nwts .and. size(map%isrc) == nwts &
+          .and. size(map%idst) == nwts) then
         shr_map_checkFilled = .true.
-     endif
-  endif
+      end if
+    end if
 
-end function shr_map_checkFilled
+  end function shr_map_checkFilled
 
 !===============================================================================
 !XXBOP ===========================================================================
@@ -324,37 +324,37 @@ end function shr_map_checkFilled
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-logical function shr_map_checkFldStr(fldStr)
+  logical function shr_map_checkFldStr(fldStr)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  character(*)   :: fldStr
+    character(*)   :: fldStr
 
 !XXEOP
 
-  !--- local ---
+    !--- local ---
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_checkFldStr') "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_checkFldStr') "
 
 !-------------------------------------------------------------------------------
 
-  shr_map_checkFldStr = .false.
+    shr_map_checkFldStr = .false.
 
-  if     (trim(fldStr) == trim(shr_map_fs_type).or. &
-          trim(fldStr) == trim(shr_map_fs_name).or. &
-          trim(fldStr) == trim(shr_map_fs_algo).or. &
-          trim(fldStr) == trim(shr_map_fs_mask).or. &
-          trim(fldStr) == trim(shr_map_fs_vect).or. &
-          trim(fldStr) == trim(shr_map_fs_nsrc).or. &
-          trim(fldStr) == trim(shr_map_fs_ndst).or. &
-          trim(fldStr) == trim(shr_map_fs_nwts)) then
-     shr_map_checkFldStr = .true.
-  endif
+    if (trim(fldStr) == trim(shr_map_fs_type) .or. &
+        trim(fldStr) == trim(shr_map_fs_name) .or. &
+        trim(fldStr) == trim(shr_map_fs_algo) .or. &
+        trim(fldStr) == trim(shr_map_fs_mask) .or. &
+        trim(fldStr) == trim(shr_map_fs_vect) .or. &
+        trim(fldStr) == trim(shr_map_fs_nsrc) .or. &
+        trim(fldStr) == trim(shr_map_fs_ndst) .or. &
+        trim(fldStr) == trim(shr_map_fs_nwts)) then
+      shr_map_checkFldStr = .true.
+    end if
 
-end function shr_map_checkFldStr
+  end function shr_map_checkFldStr
 
 !===============================================================================
 !XXBOP ===========================================================================
@@ -372,50 +372,50 @@ end function shr_map_checkFldStr
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-logical function shr_map_checkFldStrOpt(fldStr,cval)
+  logical function shr_map_checkFldStrOpt(fldStr, cval)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  character(*),intent(in) :: fldStr
-  character(*),intent(in) :: cval
+    character(*), intent(in) :: fldStr
+    character(*), intent(in) :: cval
 
 !XXEOP
 
-  !--- local ---
-  integer(SHR_KIND_IN)   :: n
+    !--- local ---
+    integer(SHR_KIND_IN)   :: n
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_checkFldStrOpt') "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_checkFldStrOpt') "
 
 !-------------------------------------------------------------------------------
 
-  shr_map_checkFldStrOpt = .false.
+    shr_map_checkFldStrOpt = .false.
 
-  if (.not.shr_map_checkFldStr(fldStr)) return
+    if (.not. shr_map_checkFldStr(fldStr)) return
 
-  if (trim(fldStr) == trim(shr_map_fs_name)) then
-       shr_map_checkFldStrOpt = .true.
-  elseif (trim(fldStr) == trim(shr_map_fs_type)) then
-    do n = 1,shr_map_fs_ntype
-      if (trim(cval) == trim(shr_map_fs_types(n))) shr_map_checkFldStrOpt = .true.
-    enddo
-  elseif (trim(fldStr) == trim(shr_map_fs_algo)) then
-    do n = 1,shr_map_fs_nalgo
-      if (trim(cval) == trim(shr_map_fs_algos(n))) shr_map_checkFldStrOpt = .true.
-    enddo
-  elseif (trim(fldStr) == trim(shr_map_fs_mask)) then
-    do n = 1,shr_map_fs_nmask
-      if (trim(cval) == trim(shr_map_fs_masks(n))) shr_map_checkFldStrOpt = .true.
-    enddo
-  elseif (trim(fldStr) == trim(shr_map_fs_vect)) then
-    do n = 1,shr_map_fs_nvect
-      if (trim(cval) == trim(shr_map_fs_vects(n))) shr_map_checkFldStrOpt = .true.
-    enddo
-  endif
+    if (trim(fldStr) == trim(shr_map_fs_name)) then
+      shr_map_checkFldStrOpt = .true.
+    elseif (trim(fldStr) == trim(shr_map_fs_type)) then
+      do n = 1, shr_map_fs_ntype
+        if (trim(cval) == trim(shr_map_fs_types(n))) shr_map_checkFldStrOpt = .true.
+      end do
+    elseif (trim(fldStr) == trim(shr_map_fs_algo)) then
+      do n = 1, shr_map_fs_nalgo
+        if (trim(cval) == trim(shr_map_fs_algos(n))) shr_map_checkFldStrOpt = .true.
+      end do
+    elseif (trim(fldStr) == trim(shr_map_fs_mask)) then
+      do n = 1, shr_map_fs_nmask
+        if (trim(cval) == trim(shr_map_fs_masks(n))) shr_map_checkFldStrOpt = .true.
+      end do
+    elseif (trim(fldStr) == trim(shr_map_fs_vect)) then
+      do n = 1, shr_map_fs_nvect
+        if (trim(cval) == trim(shr_map_fs_vects(n))) shr_map_checkFldStrOpt = .true.
+      end do
+    end if
 
-end function shr_map_checkFldStrOpt
+  end function shr_map_checkFldStrOpt
 
 !===============================================================================
 !BOP ===========================================================================
@@ -433,46 +433,46 @@ end function shr_map_checkFldStrOpt
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_getCS(map,fldStr,cval)
+  subroutine shr_map_getCS(map, fldStr, cval)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType) ,intent(in) :: map
-  character(*)          ,intent(in) :: fldStr
-  character(*)          ,intent(out):: cval
+    type(shr_map_mapType), intent(in) :: map
+    character(*), intent(in) :: fldStr
+    character(*), intent(out):: cval
 
 !EOP
 
-  !--- local ---
+    !--- local ---
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_getCS') "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_getCS') "
 
 !-------------------------------------------------------------------------------
 
-  cval = shr_map_setFal
-  if (.not.shr_map_checkFldStr(fldStr)) then
-    call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-    return
-  endif
+    cval = shr_map_setFal
+    if (.not. shr_map_checkFldStr(fldStr)) then
+      call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
+      return
+    end if
 
-  if     (trim(fldStr) == trim(shr_map_fs_name)) then
-    cval = map%name
-  elseif (trim(fldStr) == trim(shr_map_fs_type)) then
-    cval = map%type
-  elseif (trim(fldStr) == trim(shr_map_fs_algo)) then
-    cval = map%algo
-  elseif (trim(fldStr) == trim(shr_map_fs_mask)) then
-    cval = map%mask
-  elseif (trim(fldStr) == trim(shr_map_fs_vect)) then
-    cval = map%vect
-  else
-    call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-  endif
+    if (trim(fldStr) == trim(shr_map_fs_name)) then
+      cval = map%name
+    elseif (trim(fldStr) == trim(shr_map_fs_type)) then
+      cval = map%type
+    elseif (trim(fldStr) == trim(shr_map_fs_algo)) then
+      cval = map%algo
+    elseif (trim(fldStr) == trim(shr_map_fs_mask)) then
+      cval = map%mask
+    elseif (trim(fldStr) == trim(shr_map_fs_vect)) then
+      cval = map%vect
+    else
+      call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
+    end if
 
-end subroutine shr_map_getCS
+  end subroutine shr_map_getCS
 
 !===============================================================================
 !BOP ===========================================================================
@@ -490,42 +490,42 @@ end subroutine shr_map_getCS
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_getIN(map,fldStr,ival)
+  subroutine shr_map_getIN(map, fldStr, ival)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType) ,intent(in) :: map
-  character(*)          ,intent(in) :: fldStr
-  integer(SHR_KIND_IN)  ,intent(out):: ival
+    type(shr_map_mapType), intent(in) :: map
+    character(*), intent(in) :: fldStr
+    integer(SHR_KIND_IN), intent(out):: ival
 
 !EOP
 
-  !--- local ---
+    !--- local ---
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_getIN') "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_getIN') "
 
 !-------------------------------------------------------------------------------
 
-  ival = shr_map_ispval
-  if (.not.shr_map_checkFldStr(fldStr)) then
-    call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-    return
-  endif
+    ival = shr_map_ispval
+    if (.not. shr_map_checkFldStr(fldStr)) then
+      call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
+      return
+    end if
 
-  if     (trim(fldStr) == trim(shr_map_fs_nwts)) then
-    ival = map%nwts
-  elseif (trim(fldStr) == trim(shr_map_fs_nsrc)) then
-    ival = map%nsrc
-  elseif (trim(fldStr) == trim(shr_map_fs_ndst)) then
-    ival = map%ndst
-  else
-    call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-  endif
+    if (trim(fldStr) == trim(shr_map_fs_nwts)) then
+      ival = map%nwts
+    elseif (trim(fldStr) == trim(shr_map_fs_nsrc)) then
+      ival = map%nsrc
+    elseif (trim(fldStr) == trim(shr_map_fs_ndst)) then
+      ival = map%ndst
+    else
+      call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
+    end if
 
-end subroutine shr_map_getIN
+  end subroutine shr_map_getIN
 
 !===============================================================================
 !BOP ===========================================================================
@@ -541,34 +541,34 @@ end subroutine shr_map_getIN
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_getR8(map,fldStr,rval)
+  subroutine shr_map_getR8(map, fldStr, rval)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType) ,intent(in) :: map
-  character(*)          ,intent(in) :: fldStr
-  real(SHR_KIND_R8)     ,intent(out):: rval
+    type(shr_map_mapType), intent(in) :: map
+    character(*), intent(in) :: fldStr
+    real(SHR_KIND_R8), intent(out):: rval
 
 !EOP
 
-  !--- local ---
+    !--- local ---
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_getR8') "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_getR8') "
 
 !-------------------------------------------------------------------------------
 
-  rval = shr_map_spval
-  if (.not.shr_map_checkFldStr(fldStr)) then
+    rval = shr_map_spval
+    if (.not. shr_map_checkFldStr(fldStr)) then
+      call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
+      return
+    end if
+
     call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-    return
-  endif
 
-  call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-
-end subroutine shr_map_getR8
+  end subroutine shr_map_getR8
 
 !===============================================================================
 !BOP ===========================================================================
@@ -588,49 +588,49 @@ end subroutine shr_map_getR8
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_putCS(map,fldStr,cval,verify)
+  subroutine shr_map_putCS(map, fldStr, cval, verify)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType) ,intent(inout):: map
-  character(*)          ,intent(in) :: fldStr
-  character(*)          ,intent(in) :: cval
-  logical,optional      ,intent(in) :: verify     ! check if string is valid
+    type(shr_map_mapType), intent(inout):: map
+    character(*), intent(in) :: fldStr
+    character(*), intent(in) :: cval
+    logical, optional, intent(in) :: verify     ! check if string is valid
 
 !EOP
 
-  !--- local ---
-  logical :: lverify
+    !--- local ---
+    logical :: lverify
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_putCS') "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_putCS') "
 
 !-------------------------------------------------------------------------------
 
-  lverify = .true.
-  if (present(verify)) lverify = verify
-  if (lverify .and. .not.shr_map_checkFldStrOpt(fldStr,cval)) then
-    call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr)//' '//trim(cval))
-    return
-  endif
+    lverify = .true.
+    if (present(verify)) lverify = verify
+    if (lverify .and. .not. shr_map_checkFldStrOpt(fldStr, cval)) then
+      call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr)//' '//trim(cval))
+      return
+    end if
 
-  if (trim(fldStr) == trim(shr_map_fs_name)) then
-    map%name = cval
-  elseif (trim(fldStr) == trim(shr_map_fs_type)) then
-    map%type = cval
-  elseif (trim(fldStr) == trim(shr_map_fs_algo)) then
-    map%algo = cval
-  elseif (trim(fldStr) == trim(shr_map_fs_mask)) then
-    map%mask = cval
-  elseif (trim(fldStr) == trim(shr_map_fs_vect)) then
-    map%vect = cval
-  else
-    call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-  endif
+    if (trim(fldStr) == trim(shr_map_fs_name)) then
+      map%name = cval
+    elseif (trim(fldStr) == trim(shr_map_fs_type)) then
+      map%type = cval
+    elseif (trim(fldStr) == trim(shr_map_fs_algo)) then
+      map%algo = cval
+    elseif (trim(fldStr) == trim(shr_map_fs_mask)) then
+      map%mask = cval
+    elseif (trim(fldStr) == trim(shr_map_fs_vect)) then
+      map%vect = cval
+    else
+      call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
+    end if
 
-end subroutine shr_map_putCS
+  end subroutine shr_map_putCS
 
 !===============================================================================
 !BOP ===========================================================================
@@ -650,46 +650,46 @@ end subroutine shr_map_putCS
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_putIN(map,fldStr,ival,verify)
+  subroutine shr_map_putIN(map, fldStr, ival, verify)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType) ,intent(inout):: map
-  character(*)          ,intent(in) :: fldStr
-  integer(SHR_KIND_IN)  ,intent(in) :: ival
-  logical,optional      ,intent(in) :: verify     ! check if string is valid
+    type(shr_map_mapType), intent(inout):: map
+    character(*), intent(in) :: fldStr
+    integer(SHR_KIND_IN), intent(in) :: ival
+    logical, optional, intent(in) :: verify     ! check if string is valid
 
 !EOP
 
-  !--- local ---
-  logical :: lverify
+    !--- local ---
+    logical :: lverify
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_putIN') "
-  character(*),parameter :: F01     = "('(shr_map_putIN) ',a,i8) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_putIN') "
+    character(*), parameter :: F01 = "('(shr_map_putIN) ',a,i8) "
 
 !-------------------------------------------------------------------------------
 
-  lverify = .true.
-  if (present(verify)) lverify = verify
-  if (lverify .and. .not.shr_map_checkFldStr(fldStr)) then
-    call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-    return
-  endif
+    lverify = .true.
+    if (present(verify)) lverify = verify
+    if (lverify .and. .not. shr_map_checkFldStr(fldStr)) then
+      call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
+      return
+    end if
 
-  if     (trim(fldStr) == trim(shr_map_fs_nwts)) then
-    map%nwts = ival
-  elseif (trim(fldStr) == trim(shr_map_fs_nsrc)) then
-    map%nsrc = ival
-  elseif (trim(fldStr) == trim(shr_map_fs_ndst)) then
-    map%ndst = ival
-  else
-    call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-  endif
+    if (trim(fldStr) == trim(shr_map_fs_nwts)) then
+      map%nwts = ival
+    elseif (trim(fldStr) == trim(shr_map_fs_nsrc)) then
+      map%nsrc = ival
+    elseif (trim(fldStr) == trim(shr_map_fs_ndst)) then
+      map%ndst = ival
+    else
+      call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
+    end if
 
-end subroutine shr_map_putIN
+  end subroutine shr_map_putIN
 
 !===============================================================================
 !BOP ===========================================================================
@@ -707,37 +707,37 @@ end subroutine shr_map_putIN
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_putR8(map,fldStr,rval,verify)
+  subroutine shr_map_putR8(map, fldStr, rval, verify)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType) ,intent(inout):: map
-  character(*)          ,intent(in) :: fldStr
-  real(SHR_KIND_R8)     ,intent(in) :: rval
-  logical,optional      ,intent(in) :: verify     ! check if string is valid
+    type(shr_map_mapType), intent(inout):: map
+    character(*), intent(in) :: fldStr
+    real(SHR_KIND_R8), intent(in) :: rval
+    logical, optional, intent(in) :: verify     ! check if string is valid
 
 !EOP
 
-  !--- local ---
-  logical :: lverify
+    !--- local ---
+    logical :: lverify
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_putR8') "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_putR8') "
 
 !-------------------------------------------------------------------------------
 
-  lverify = .true.
-  if (present(verify)) lverify = verify
-  if (lverify .and. .not.shr_map_checkFldStr(fldStr)) then
+    lverify = .true.
+    if (present(verify)) lverify = verify
+    if (lverify .and. .not. shr_map_checkFldStr(fldStr)) then
+      call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
+      return
+    end if
+
     call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-    return
-  endif
 
-  call shr_map_abort(subName//' ERROR illegal fldStr '//trim(fldStr))
-
-end subroutine shr_map_putR8
+  end subroutine shr_map_putR8
 
 !===============================================================================
 !BOP ===========================================================================
@@ -754,44 +754,44 @@ end subroutine shr_map_putR8
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_print(map)
+  subroutine shr_map_print(map)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType) ,intent(in) :: map
+    type(shr_map_mapType), intent(in) :: map
 
 !EOP
 
-  !--- local ---
+    !--- local ---
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_print') "
-  character(*),parameter :: F00     = "('(shr_map_print) ',a) "
-  character(*),parameter :: F01     = "('(shr_map_print) ',a,2l2) "
-  character(*),parameter :: F02     = "('(shr_map_print) ',a,i8) "
-  character(*),parameter :: F03     = "('(shr_map_print) ',a,3i8) "
-  character(*),parameter :: F04     = "('(shr_map_print) ',a,2i8) "
-  character(*),parameter :: F05     = "('(shr_map_print) ',a,2e20.13) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_print') "
+    character(*), parameter :: F00 = "('(shr_map_print) ',a) "
+    character(*), parameter :: F01 = "('(shr_map_print) ',a,2l2) "
+    character(*), parameter :: F02 = "('(shr_map_print) ',a,i8) "
+    character(*), parameter :: F03 = "('(shr_map_print) ',a,3i8) "
+    character(*), parameter :: F04 = "('(shr_map_print) ',a,2i8) "
+    character(*), parameter :: F05 = "('(shr_map_print) ',a,2e20.13) "
 
-  write(6,*) ' '
-  write(6,F01) '   name : '//trim(map%name),shr_map_checkInit(map),shr_map_checkFilled(map)
-  write(6,F00) '   type : '//trim(map%type)
-  write(6,F00) '   algo : '//trim(map%algo)
-  write(6,F00) '   mask : '//trim(map%mask)
-  write(6,F00) '   vect : '//trim(map%vect)
-  write(6,F04) '   gsiz : ',map%nsrc,map%ndst
-  write(6,F05) '   xsrc : ',minval(map%xsrc),maxval(map%xsrc)
-  write(6,F05) '   ysrc : ',minval(map%ysrc),maxval(map%ysrc)
-  write(6,F05) '   xdst : ',minval(map%xdst),maxval(map%xdst)
-  write(6,F05) '   ydst : ',minval(map%ydst),maxval(map%ydst)
-  write(6,F02) '   nwts : ',map%nwts
-  write(6,F03) '   wsiz : ',size(map%wgts),size(map%isrc),size(map%idst)
+    write (6, *) ' '
+    write (6, F01) '   name : '//trim(map%name), shr_map_checkInit(map), shr_map_checkFilled(map)
+    write (6, F00) '   type : '//trim(map%type)
+    write (6, F00) '   algo : '//trim(map%algo)
+    write (6, F00) '   mask : '//trim(map%mask)
+    write (6, F00) '   vect : '//trim(map%vect)
+    write (6, F04) '   gsiz : ', map%nsrc, map%ndst
+    write (6, F05) '   xsrc : ', minval(map%xsrc), maxval(map%xsrc)
+    write (6, F05) '   ysrc : ', minval(map%ysrc), maxval(map%ysrc)
+    write (6, F05) '   xdst : ', minval(map%xdst), maxval(map%xdst)
+    write (6, F05) '   ydst : ', minval(map%ydst), maxval(map%ydst)
+    write (6, F02) '   nwts : ', map%nwts
+    write (6, F03) '   wsiz : ', size(map%wgts), size(map%isrc), size(map%idst)
 
-  call shr_sys_flush(6)
+    call shr_sys_flush(6)
 
-end subroutine shr_map_print
+  end subroutine shr_map_print
 
 !===============================================================================
 !BOP ===========================================================================
@@ -808,41 +808,41 @@ end subroutine shr_map_print
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_listValidOpts()
+  subroutine shr_map_listValidOpts()
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
 !EOP
 
-  !--- local ---
-  integer(SHR_KIND_IN) :: n
+    !--- local ---
+    integer(SHR_KIND_IN) :: n
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_listValidOpts') "
-  character(*),parameter :: F00     = "('(shr_map_listValidOpts) ',a) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_listValidOpts') "
+    character(*), parameter :: F00 = "('(shr_map_listValidOpts) ',a) "
 
 !-------------------------------------------------------------------------------
 
-    write(6,F00) ':'
-    write(6,F00) '  '//trim(shr_map_fs_name)//' : any character string'
-  do n = 1,shr_map_fs_ntype
-    write(6,F00) '  '//trim(shr_map_fs_type)//' : '//trim(shr_map_fs_types(n))
-  enddo
-  do n = 1,shr_map_fs_nalgo
-    write(6,F00) '  '//trim(shr_map_fs_algo)//' : '//trim(shr_map_fs_algos(n))
-  enddo
-  do n = 1,shr_map_fs_nmask
-    write(6,F00) '  '//trim(shr_map_fs_mask)//' : '//trim(shr_map_fs_masks(n))
-  enddo
-  do n = 1,shr_map_fs_nvect
-    write(6,F00) '  '//trim(shr_map_fs_vect)//' : '//trim(shr_map_fs_vects(n))
-  enddo
-  
-  call shr_sys_flush(6)
+    write (6, F00) ':'
+    write (6, F00) '  '//trim(shr_map_fs_name)//' : any character string'
+    do n = 1, shr_map_fs_ntype
+      write (6, F00) '  '//trim(shr_map_fs_type)//' : '//trim(shr_map_fs_types(n))
+    end do
+    do n = 1, shr_map_fs_nalgo
+      write (6, F00) '  '//trim(shr_map_fs_algo)//' : '//trim(shr_map_fs_algos(n))
+    end do
+    do n = 1, shr_map_fs_nmask
+      write (6, F00) '  '//trim(shr_map_fs_mask)//' : '//trim(shr_map_fs_masks(n))
+    end do
+    do n = 1, shr_map_fs_nvect
+      write (6, F00) '  '//trim(shr_map_fs_vect)//' : '//trim(shr_map_fs_vects(n))
+    end do
 
-end subroutine shr_map_listValidOpts
+    call shr_sys_flush(6)
+
+  end subroutine shr_map_listValidOpts
 
 !===============================================================================
 !BOP ===========================================================================
@@ -859,50 +859,50 @@ end subroutine shr_map_listValidOpts
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_clean(map)
+  subroutine shr_map_clean(map)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType) ,intent(inout):: map
+    type(shr_map_mapType), intent(inout):: map
 
 !EOP
 
-  !--- local ---
-  integer :: rc
+    !--- local ---
+    integer :: rc
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_clean') "
-  character(*),parameter :: F00     = "('(shr_map_clean) ',a) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_clean') "
+    character(*), parameter :: F00 = "('(shr_map_clean) ',a) "
 
 !-------------------------------------------------------------------------------
 
-  map%fill = ' '
-  call shr_map_put(map,shr_map_fs_name,shr_map_setFal,verify=.false.)
-  call shr_map_put(map,shr_map_fs_type,shr_map_setFal,verify=.false.)
-  call shr_map_put(map,shr_map_fs_algo,shr_map_setFal,verify=.false.)
-  call shr_map_put(map,shr_map_fs_mask,shr_map_setFal,verify=.false.)
-  call shr_map_put(map,shr_map_fs_mask,shr_map_setFal,verify=.false.)
-  call shr_map_put(map,shr_map_fs_nwts,shr_map_ispval)
-  call shr_map_put(map,shr_map_fs_nsrc,shr_map_ispval)
-  call shr_map_put(map,shr_map_fs_ndst,shr_map_ispval)
-  deallocate(map%xsrc,stat=rc)
-  if (rc > 0.and.debug > 1) write(6,F00) 'Warning: unable to deallocate map wgts'
-  deallocate(map%ysrc,stat=rc)
-  if (rc > 0.and.debug > 1) write(6,F00) 'Warning: unable to deallocate map wgts'
-  deallocate(map%xdst,stat=rc)
-  if (rc > 0.and.debug > 1) write(6,F00) 'Warning: unable to deallocate map wgts'
-  deallocate(map%ydst,stat=rc)
-  if (rc > 0.and.debug > 1) write(6,F00) 'Warning: unable to deallocate map wgts'
-  deallocate(map%wgts,stat=rc)
-  if (rc > 0.and.debug > 1) write(6,F00) 'Warning: unable to deallocate map wgts'
-  deallocate(map%isrc,stat=rc)
-  if (rc > 0.and.debug > 1) write(6,F00) 'Warning: unable to deallocate map isrc'
-  deallocate(map%idst,stat=rc)
-  if (rc > 0.and.debug > 1) write(6,F00) 'Warning: unable to deallocate map idst'
+    map%fill = ' '
+    call shr_map_put(map, shr_map_fs_name, shr_map_setFal, verify=.false.)
+    call shr_map_put(map, shr_map_fs_type, shr_map_setFal, verify=.false.)
+    call shr_map_put(map, shr_map_fs_algo, shr_map_setFal, verify=.false.)
+    call shr_map_put(map, shr_map_fs_mask, shr_map_setFal, verify=.false.)
+    call shr_map_put(map, shr_map_fs_mask, shr_map_setFal, verify=.false.)
+    call shr_map_put(map, shr_map_fs_nwts, shr_map_ispval)
+    call shr_map_put(map, shr_map_fs_nsrc, shr_map_ispval)
+    call shr_map_put(map, shr_map_fs_ndst, shr_map_ispval)
+    deallocate (map%xsrc, stat=rc)
+    if (rc > 0 .and. debug > 1) write (6, F00) 'Warning: unable to deallocate map wgts'
+    deallocate (map%ysrc, stat=rc)
+    if (rc > 0 .and. debug > 1) write (6, F00) 'Warning: unable to deallocate map wgts'
+    deallocate (map%xdst, stat=rc)
+    if (rc > 0 .and. debug > 1) write (6, F00) 'Warning: unable to deallocate map wgts'
+    deallocate (map%ydst, stat=rc)
+    if (rc > 0 .and. debug > 1) write (6, F00) 'Warning: unable to deallocate map wgts'
+    deallocate (map%wgts, stat=rc)
+    if (rc > 0 .and. debug > 1) write (6, F00) 'Warning: unable to deallocate map wgts'
+    deallocate (map%isrc, stat=rc)
+    if (rc > 0 .and. debug > 1) write (6, F00) 'Warning: unable to deallocate map isrc'
+    deallocate (map%idst, stat=rc)
+    if (rc > 0 .and. debug > 1) write (6, F00) 'Warning: unable to deallocate map idst'
 
-end subroutine shr_map_clean
+  end subroutine shr_map_clean
 
 !===============================================================================
 !BOP ===========================================================================
@@ -942,385 +942,385 @@ end subroutine shr_map_clean
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_mapSet(map,Xsrc,Ysrc,Msrc,Xdst_in,Ydst,Mdst,name,type,algo,mask,vect,rc)
+  subroutine shr_map_mapSet(map, Xsrc, Ysrc, Msrc, Xdst_in, Ydst, Mdst, name, type, algo, mask, vect, rc)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  type(shr_map_mapType) ,intent(inout):: map      ! map
-  real(SHR_KIND_R8)     ,intent(in) :: Xsrc(:,:)  ! lon of src grid
-  real(SHR_KIND_R8)     ,intent(in) :: Ysrc(:,:)  ! lat of src grid
-  integer(SHR_KIND_IN)  ,intent(in) :: Msrc(:,:)  ! mask of src grid
-  real(SHR_KIND_R8)     ,intent(in) :: Xdst_in(:,:)  ! lon of dst grid
-  real(SHR_KIND_R8)     ,intent(in) :: Ydst(:,:)  ! lat of dst grid
-  integer(SHR_KIND_IN)  ,intent(in) :: Mdst(:,:)  ! mask of dst grid
-  character(*) ,optional,intent(in) :: name       ! name
-  character(*) ,optional,intent(in) :: type       ! type
-  character(*) ,optional,intent(in) :: algo       ! algo
-  character(*) ,optional,intent(in) :: mask       ! mask
-  character(*) ,optional,intent(in) :: vect       ! vect
-  integer(SHR_KIND_IN),optional,intent(out) :: rc ! error code
+    type(shr_map_mapType), intent(inout):: map      ! map
+    real(SHR_KIND_R8), intent(in) :: Xsrc(:, :)  ! lon of src grid
+    real(SHR_KIND_R8), intent(in) :: Ysrc(:, :)  ! lat of src grid
+    integer(SHR_KIND_IN), intent(in) :: Msrc(:, :)  ! mask of src grid
+    real(SHR_KIND_R8), intent(in) :: Xdst_in(:, :)  ! lon of dst grid
+    real(SHR_KIND_R8), intent(in) :: Ydst(:, :)  ! lat of dst grid
+    integer(SHR_KIND_IN), intent(in) :: Mdst(:, :)  ! mask of dst grid
+    character(*), optional, intent(in) :: name       ! name
+    character(*), optional, intent(in) :: type       ! type
+    character(*), optional, intent(in) :: algo       ! algo
+    character(*), optional, intent(in) :: mask       ! mask
+    character(*), optional, intent(in) :: vect       ! vect
+    integer(SHR_KIND_IN), optional, intent(out) :: rc ! error code
 
 !EOP
 
-  !--- local ---
-  integer(SHR_KIND_IN)   :: nis,njs,nid,njd
-  integer(SHR_KIND_IN)   :: nwts,n,n1,n2,ncnt,i,j,inn,jnn
-  integer(SHR_KIND_IN)   :: irc,lrc
-  real(SHR_KIND_R8) :: rmin,rmax                     ! min/max value
-  real(SHR_KIND_R8) :: cang                          ! circle angle, deg or rad
-  real(SHR_KIND_R8),allocatable    :: Xdst(:,:)      ! lon of dst grid, wrapped as needed
+    !--- local ---
+    integer(SHR_KIND_IN)   :: nis, njs, nid, njd
+    integer(SHR_KIND_IN)   :: nwts, n, n1, n2, ncnt, i, j, inn, jnn
+    integer(SHR_KIND_IN)   :: irc, lrc
+    real(SHR_KIND_R8) :: rmin, rmax                     ! min/max value
+    real(SHR_KIND_R8) :: cang                          ! circle angle, deg or rad
+    real(SHR_KIND_R8), allocatable    :: Xdst(:, :)      ! lon of dst grid, wrapped as needed
 
-  integer(SHR_KIND_IN)             :: pmax           ! max num of wgts in pti...
-  integer(SHR_KIND_IN)             :: pnum           ! num of wgts set in pti...
-  integer(SHR_KIND_IN),allocatable :: pti(:)         ! i index for wgts
-  integer(SHR_KIND_IN),allocatable :: ptj(:)         ! j index for wgts
-  real(SHR_KIND_R8)   ,allocatable :: ptw(:)         ! weights for pti,ptj
+    integer(SHR_KIND_IN)             :: pmax           ! max num of wgts in pti...
+    integer(SHR_KIND_IN)             :: pnum           ! num of wgts set in pti...
+    integer(SHR_KIND_IN), allocatable :: pti(:)         ! i index for wgts
+    integer(SHR_KIND_IN), allocatable :: ptj(:)         ! j index for wgts
+    real(SHR_KIND_R8), allocatable :: ptw(:)         ! weights for pti,ptj
 
-  integer(SHR_KIND_IN),allocatable :: lis(:)         ! tmp src/dst index
-  integer(SHR_KIND_IN),allocatable :: lid(:)         ! tmp src/dst index
-  real(SHR_KIND_R8)   ,allocatable :: lwt(:)         ! tmp wgt array
-  real(SHR_KIND_R8)   ,allocatable :: sum(:)         ! tmp sum array
+    integer(SHR_KIND_IN), allocatable :: lis(:)         ! tmp src/dst index
+    integer(SHR_KIND_IN), allocatable :: lid(:)         ! tmp src/dst index
+    real(SHR_KIND_R8), allocatable :: lwt(:)         ! tmp wgt array
+    real(SHR_KIND_R8), allocatable :: sum(:)         ! tmp sum array
 
-  logical :: masksrc       ! local var to turn on masking using src mask
-  logical :: maskdst       ! local var to turn on masking using dst mask
-  logical :: maskdstbysrc  ! local var to turn on masking using src mask for
-                           ! dst array, especially for fill
-  logical :: renorm        ! local var to turn on renormalization
+    logical :: masksrc       ! local var to turn on masking using src mask
+    logical :: maskdst       ! local var to turn on masking using dst mask
+    logical :: maskdstbysrc  ! local var to turn on masking using src mask for
+    ! dst array, especially for fill
+    logical :: renorm        ! local var to turn on renormalization
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_mapSet') "
-  character(*),parameter :: F00     = "('(shr_map_mapSet) ',a) "
-  character(*),parameter :: F01     = "('(shr_map_mapSet) ',a,l2) "
-  character(*),parameter :: F02     = "('(shr_map_mapSet) ',a,2i8) "
-  character(*),parameter :: F03     = "('(shr_map_mapSet) ',a,2e20.13) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_mapSet') "
+    character(*), parameter :: F00 = "('(shr_map_mapSet) ',a) "
+    character(*), parameter :: F01 = "('(shr_map_mapSet) ',a,l2) "
+    character(*), parameter :: F02 = "('(shr_map_mapSet) ',a,2i8) "
+    character(*), parameter :: F03 = "('(shr_map_mapSet) ',a,2e20.13) "
 
 !-------------------------------------------------------------------------------
 
-  lrc = 0
-  if (present(rc)) rc = lrc
+    lrc = 0
+    if (present(rc)) rc = lrc
 
-  if (present(name)) call shr_map_put(map,shr_map_fs_name,name)
-  if (present(type)) call shr_map_put(map,shr_map_fs_type,type,verify=.true.)
-  if (present(algo)) call shr_map_put(map,shr_map_fs_algo,algo,verify=.true.)
-  if (present(mask)) call shr_map_put(map,shr_map_fs_mask,mask,verify=.true.)
-  if (present(vect)) call shr_map_put(map,shr_map_fs_vect,vect,verify=.true.)
+    if (present(name)) call shr_map_put(map, shr_map_fs_name, name)
+    if (present(type)) call shr_map_put(map, shr_map_fs_type, type, verify=.true.)
+    if (present(algo)) call shr_map_put(map, shr_map_fs_algo, algo, verify=.true.)
+    if (present(mask)) call shr_map_put(map, shr_map_fs_mask, mask, verify=.true.)
+    if (present(vect)) call shr_map_put(map, shr_map_fs_vect, vect, verify=.true.)
 
-  if (.NOT.shr_map_checkInit(map)) then
-    call shr_map_abort(subName//' ERROR map not initialized')
-  endif
+    if (.NOT. shr_map_checkInit(map)) then
+      call shr_map_abort(subName//' ERROR map not initialized')
+    end if
 
-  !--- is lat/lon degrees or radians? ---
-  cang = 360._SHR_KIND_R8
-  if (shr_map_checkRad(Ysrc)) then
-    cang=c2*pi
-  endif
+    !--- is lat/lon degrees or radians? ---
+    cang = 360._SHR_KIND_R8
+    if (shr_map_checkRad(Ysrc)) then
+      cang = c2*pi
+    end if
 
-  nis = size(Xsrc,1)
-  njs = size(Xsrc,2)
-  nid = size(Xdst_in,1)
-  njd = size(Xdst_in,2)
+    nis = size(Xsrc, 1)
+    njs = size(Xsrc, 2)
+    nid = size(Xdst_in, 1)
+    njd = size(Xdst_in, 2)
 
-  !--- shift Xdst by 2pi to range of Xsrc as needed ---
-  allocate(Xdst(nid,njd))
-  rmin = minval(Xsrc)
-  rmax = maxval(Xsrc)
-  do j=1,njd
-  do i=1,nid
-    Xdst(i,j) = Xdst_in(i,j)
-    do while ((Xdst(i,j) < rmin .and. Xdst(i,j)+cang <= rmax).or.  &
-              (Xdst(i,j) > rmax .and. Xdst(i,j)-cang >= rmin))
-      if (Xdst(i,j) < rmin) then
-        Xdst(i,j) = Xdst(i,j) + cang
-      elseif (Xdst(i,j) > rmax) then
-        Xdst(i,j) = Xdst(i,j) - cang
-      else
-        call shr_sys_abort(subName//' ERROR in Xdst wrap')
-      endif
-    enddo
-  enddo
-  enddo
-  
-  call shr_map_checkGrids(Xsrc,Ysrc,Msrc,Xdst,Ydst,Mdst,map,lrc)
+    !--- shift Xdst by 2pi to range of Xsrc as needed ---
+    allocate (Xdst(nid, njd))
+    rmin = minval(Xsrc)
+    rmax = maxval(Xsrc)
+    do j = 1, njd
+    do i = 1, nid
+      Xdst(i, j) = Xdst_in(i, j)
+      do while ((Xdst(i, j) < rmin .and. Xdst(i, j) + cang <= rmax) .or. &
+                (Xdst(i, j) > rmax .and. Xdst(i, j) - cang >= rmin))
+        if (Xdst(i, j) < rmin) then
+          Xdst(i, j) = Xdst(i, j) + cang
+        elseif (Xdst(i, j) > rmax) then
+          Xdst(i, j) = Xdst(i, j) - cang
+        else
+          call shr_sys_abort(subName//' ERROR in Xdst wrap')
+        end if
+      end do
+    end do
+    end do
 
-  map%nsrc = nis*njs
-  map%ndst = nid*njd
+    call shr_map_checkGrids(Xsrc, Ysrc, Msrc, Xdst, Ydst, Mdst, map, lrc)
+
+    map%nsrc = nis*njs
+    map%ndst = nid*njd
 
 ! deallocate(map%xsrc,stat=irc) ! this used to be a safe way to delloc when necessary,
 ! deallocate(map%ysrc,stat=irc) ! but do nothing when pointers were undefined or
 ! deallocate(map%xdst,stat=irc) ! un-associated, in Oct 2005, undefined ptrs started
 ! deallocate(map%ydst,stat=irc) ! causing seg-faults on bluesky (B. Kauffman)
-  allocate(map%xsrc(nis*njs))
-  allocate(map%ysrc(nis*njs))
-  allocate(map%xdst(nid*njd))
-  allocate(map%ydst(nid*njd))
-  do j=1,njs
-  do i=1,nis
-    call shr_map_2dto1d(n1,nis,njs,i,j)
-    map%xsrc(n1) = Xsrc(i,j)*c2*pi/cang
-    map%ysrc(n1) = Ysrc(i,j)*c2*pi/cang
-  enddo
-  enddo
-  do j=1,njd
-  do i=1,nid
-    call shr_map_2dto1d(n1,nid,njd,i,j)
-    map%xdst(n1) = Xdst(i,j)*c2*pi/cang
-    map%ydst(n1) = Ydst(i,j)*c2*pi/cang
-  enddo
-  enddo
+    allocate (map%xsrc(nis*njs))
+    allocate (map%ysrc(nis*njs))
+    allocate (map%xdst(nid*njd))
+    allocate (map%ydst(nid*njd))
+    do j = 1, njs
+    do i = 1, nis
+      call shr_map_2dto1d(n1, nis, njs, i, j)
+      map%xsrc(n1) = Xsrc(i, j)*c2*pi/cang
+      map%ysrc(n1) = Ysrc(i, j)*c2*pi/cang
+    end do
+    end do
+    do j = 1, njd
+    do i = 1, nid
+      call shr_map_2dto1d(n1, nid, njd, i, j)
+      map%xdst(n1) = Xdst(i, j)*c2*pi/cang
+      map%ydst(n1) = Ydst(i, j)*c2*pi/cang
+    end do
+    end do
 
-  masksrc = .false.
-  maskdstbysrc = .false.
-  maskdst = .false.
-  renorm  = .true.
-
-  if (trim(map%type) /= trim(shr_map_fs_fill)) then
-    if (trim(map%mask) == trim(shr_map_fs_bothmask) .or. &
-        trim(map%mask) == trim(shr_map_fs_srcmask)) masksrc = .true.
-    if (trim(map%mask) == trim(shr_map_fs_bothmask) .or. &
-        trim(map%mask) == trim(shr_map_fs_dstmask)) maskdst = .true.
-  endif
-  if (trim(map%algo) == trim(shr_map_fs_spval)) then
     masksrc = .false.
-    renorm = .false.
-  endif
+    maskdstbysrc = .false.
+    maskdst = .false.
+    renorm = .true.
 
-  if (debug > 1) then
-    write(6,*) ' '
-    call shr_map_print(map)
-  endif
-
-  if (lrc /= 0) then
-    if (present(rc)) rc = lrc
-    return
-  endif
-
-  if (dopole) then
-    pmax = nis + 2      ! pole possibility
-  else
-    pmax = 4
-  endif
-  allocate(lis(pmax*nid*njd))
-  allocate(lid(pmax*nid*njd))
-  allocate(lwt(pmax*nid*njd))
-  allocate(pti(pmax))
-  allocate(ptj(pmax))
-  allocate(ptw(pmax))
-
-  !--- full array copy is default ---
-  nwts = nid*njd
-  do n=1,nwts
-    lid(n) = n
-    lis(n) = mod(n-1,nis*njs)+1
-    lwt(n) = c1
-  enddo
-
-  !--- index copy anytime algo = copy ---
-  if (trim(map%algo) == trim(shr_map_fs_copy)) then
-    ! just use copy default
-
-  !--- for fill ---
-  elseif (trim(map%type) == trim(shr_map_fs_fill)) then
+    if (trim(map%type) /= trim(shr_map_fs_fill)) then
+      if (trim(map%mask) == trim(shr_map_fs_bothmask) .or. &
+          trim(map%mask) == trim(shr_map_fs_srcmask)) masksrc = .true.
+      if (trim(map%mask) == trim(shr_map_fs_bothmask) .or. &
+          trim(map%mask) == trim(shr_map_fs_dstmask)) maskdst = .true.
+    end if
     if (trim(map%algo) == trim(shr_map_fs_spval)) then
-      maskdstbysrc = .true.
-    elseif (trim(map%algo) == trim(shr_map_fs_nn)) then
-      do n=1,nwts
-        call shr_map_1dto2d(lis(n),nis,njs,i,j)
-        if (Msrc(i,j) == 0) then
-          call shr_map_findnn(Xsrc(i,j),Ysrc(i,j),Xsrc,Ysrc,Msrc,inn,jnn)
-          call shr_map_2dto1d(lis(n),nis,njs,inn,jnn)
-        endif
-      enddo
-    elseif (trim(map%algo) == trim(shr_map_fs_nnoni)) then
-      do n=1,nwts
-        call shr_map_1dto2d(lis(n),nis,njs,i,j)
-        if (Msrc(i,j) == 0) then
-          call shr_map_findnnon('i',Xsrc(i,j),Ysrc(i,j),Xsrc,Ysrc,Msrc,inn,jnn)
-          call shr_map_2dto1d(lis(n),nis,njs,inn,jnn)
-        endif
-      enddo
-    elseif (trim(map%algo) == trim(shr_map_fs_nnonj)) then
-      do n=1,nwts
-        call shr_map_1dto2d(lis(n),nis,njs,i,j)
-        if (Msrc(i,j) == 0) then
-          call shr_map_findnnon('j',Xsrc(i,j),Ysrc(i,j),Xsrc,Ysrc,Msrc,inn,jnn)
-          call shr_map_2dto1d(lis(n),nis,njs,inn,jnn)
-        endif
-      enddo
+      masksrc = .false.
+      renorm = .false.
+    end if
+
+    if (debug > 1) then
+      write (6, *) ' '
+      call shr_map_print(map)
+    end if
+
+    if (lrc /= 0) then
+      if (present(rc)) rc = lrc
+      return
+    end if
+
+    if (dopole) then
+      pmax = nis + 2      ! pole possibility
     else
-      call shr_map_abort(subName//' ERROR: unsupported map option combo')
-    endif
+      pmax = 4
+    end if
+    allocate (lis(pmax*nid*njd))
+    allocate (lid(pmax*nid*njd))
+    allocate (lwt(pmax*nid*njd))
+    allocate (pti(pmax))
+    allocate (ptj(pmax))
+    allocate (ptw(pmax))
 
-  !--- for remap ---
-  elseif (trim(map%type) == trim(shr_map_fs_remap)) then
-    if (trim(map%algo) == trim(shr_map_fs_spval)) then
-      nwts = 0
-    elseif (trim(map%algo) == trim(shr_map_fs_nn)) then
-      do n=1,nwts
-        call shr_map_1dto2d(lid(n),nid,njd,i,j)
-        call shr_map_findnn(Xdst(i,j),Ydst(i,j),Xsrc,Ysrc,Msrc,inn,jnn)
-        call shr_map_2dto1d(lis(n),nis,njs,inn,jnn)
-      enddo
-    elseif (trim(map%algo) == trim(shr_map_fs_nnoni)) then
-      do n=1,nwts
-        call shr_map_1dto2d(lid(n),nid,njd,i,j)
-        call shr_map_findnnon('i',Xdst(i,j),Ydst(i,j),Xsrc,Ysrc,Msrc,inn,jnn)
-        call shr_map_2dto1d(lis(n),nis,njs,inn,jnn)
-      enddo
-    elseif (trim(map%algo) == trim(shr_map_fs_nnonj)) then
-      do n=1,nwts
-        call shr_map_1dto2d(lid(n),nid,njd,i,j)
-        call shr_map_findnnon('j',Xdst(i,j),Ydst(i,j),Xsrc,Ysrc,Msrc,inn,jnn)
-        call shr_map_2dto1d(lis(n),nis,njs,inn,jnn)
-      enddo
-    elseif (trim(map%algo) == trim(shr_map_fs_bilinear)) then
-      nwts = 0
-      do n=1,nid*njd
-        call shr_map_1dto2d(n,nid,njd,i,j)
-        call shr_map_getWts(Xdst(i,j),Ydst(i,j),Xsrc,Ysrc,pti,ptj,ptw,pnum)
-        do n1 = 1,pnum
-          nwts = nwts + 1
-          lid(nwts) = n
-          call shr_map_2dto1d(lis(nwts),nis,njs,pti(n1),ptj(n1))
-          lwt(nwts) = ptw(n1)
-        enddo
-      enddo
+    !--- full array copy is default ---
+    nwts = nid*njd
+    do n = 1, nwts
+      lid(n) = n
+      lis(n) = mod(n - 1, nis*njs) + 1
+      lwt(n) = c1
+    end do
+
+    !--- index copy anytime algo = copy ---
+    if (trim(map%algo) == trim(shr_map_fs_copy)) then
+      ! just use copy default
+
+      !--- for fill ---
+    elseif (trim(map%type) == trim(shr_map_fs_fill)) then
+      if (trim(map%algo) == trim(shr_map_fs_spval)) then
+        maskdstbysrc = .true.
+      elseif (trim(map%algo) == trim(shr_map_fs_nn)) then
+        do n = 1, nwts
+          call shr_map_1dto2d(lis(n), nis, njs, i, j)
+          if (Msrc(i, j) == 0) then
+            call shr_map_findnn(Xsrc(i, j), Ysrc(i, j), Xsrc, Ysrc, Msrc, inn, jnn)
+            call shr_map_2dto1d(lis(n), nis, njs, inn, jnn)
+          end if
+        end do
+      elseif (trim(map%algo) == trim(shr_map_fs_nnoni)) then
+        do n = 1, nwts
+          call shr_map_1dto2d(lis(n), nis, njs, i, j)
+          if (Msrc(i, j) == 0) then
+            call shr_map_findnnon('i', Xsrc(i, j), Ysrc(i, j), Xsrc, Ysrc, Msrc, inn, jnn)
+            call shr_map_2dto1d(lis(n), nis, njs, inn, jnn)
+          end if
+        end do
+      elseif (trim(map%algo) == trim(shr_map_fs_nnonj)) then
+        do n = 1, nwts
+          call shr_map_1dto2d(lis(n), nis, njs, i, j)
+          if (Msrc(i, j) == 0) then
+            call shr_map_findnnon('j', Xsrc(i, j), Ysrc(i, j), Xsrc, Ysrc, Msrc, inn, jnn)
+            call shr_map_2dto1d(lis(n), nis, njs, inn, jnn)
+          end if
+        end do
+      else
+        call shr_map_abort(subName//' ERROR: unsupported map option combo')
+      end if
+
+      !--- for remap ---
+    elseif (trim(map%type) == trim(shr_map_fs_remap)) then
+      if (trim(map%algo) == trim(shr_map_fs_spval)) then
+        nwts = 0
+      elseif (trim(map%algo) == trim(shr_map_fs_nn)) then
+        do n = 1, nwts
+          call shr_map_1dto2d(lid(n), nid, njd, i, j)
+          call shr_map_findnn(Xdst(i, j), Ydst(i, j), Xsrc, Ysrc, Msrc, inn, jnn)
+          call shr_map_2dto1d(lis(n), nis, njs, inn, jnn)
+        end do
+      elseif (trim(map%algo) == trim(shr_map_fs_nnoni)) then
+        do n = 1, nwts
+          call shr_map_1dto2d(lid(n), nid, njd, i, j)
+          call shr_map_findnnon('i', Xdst(i, j), Ydst(i, j), Xsrc, Ysrc, Msrc, inn, jnn)
+          call shr_map_2dto1d(lis(n), nis, njs, inn, jnn)
+        end do
+      elseif (trim(map%algo) == trim(shr_map_fs_nnonj)) then
+        do n = 1, nwts
+          call shr_map_1dto2d(lid(n), nid, njd, i, j)
+          call shr_map_findnnon('j', Xdst(i, j), Ydst(i, j), Xsrc, Ysrc, Msrc, inn, jnn)
+          call shr_map_2dto1d(lis(n), nis, njs, inn, jnn)
+        end do
+      elseif (trim(map%algo) == trim(shr_map_fs_bilinear)) then
+        nwts = 0
+        do n = 1, nid*njd
+          call shr_map_1dto2d(n, nid, njd, i, j)
+          call shr_map_getWts(Xdst(i, j), Ydst(i, j), Xsrc, Ysrc, pti, ptj, ptw, pnum)
+          do n1 = 1, pnum
+            nwts = nwts + 1
+            lid(nwts) = n
+            call shr_map_2dto1d(lis(nwts), nis, njs, pti(n1), ptj(n1))
+            lwt(nwts) = ptw(n1)
+          end do
+        end do
+      else
+        call shr_map_abort(subName//' ERROR: unsupported map option combo')
+        if (present(rc)) rc = 1
+        return
+      end if
     else
       call shr_map_abort(subName//' ERROR: unsupported map option combo')
       if (present(rc)) rc = 1
       return
-    endif
-  else
-    call shr_map_abort(subName//' ERROR: unsupported map option combo')
-    if (present(rc)) rc = 1
-    return
-  endif
+    end if
 
 !--- compress weights and copy to map ---
-  !--- remove dst grid points ---
-  if (debug > 1) write(6,F01) 'maskdst: ',maskdst
-  if (maskdst) then
-    ncnt = 0
-    do n=1,nwts
-      call shr_map_1dto2d(lid(n),nid,njd,i,j)
-      if (Mdst(i,j) /= 0) then
-        ncnt = ncnt+1
-        lid(ncnt) = lid(n)
-        lis(ncnt) = lis(n)
-        lwt(ncnt) = lwt(n)
-      endif
-    enddo
-    if (debug > 1) write(6,F02) ' rm dst grid points, nwts old/new = ',nwts,ncnt
-    nwts = ncnt
-  endif
+    !--- remove dst grid points ---
+    if (debug > 1) write (6, F01) 'maskdst: ', maskdst
+    if (maskdst) then
+      ncnt = 0
+      do n = 1, nwts
+        call shr_map_1dto2d(lid(n), nid, njd, i, j)
+        if (Mdst(i, j) /= 0) then
+          ncnt = ncnt + 1
+          lid(ncnt) = lid(n)
+          lis(ncnt) = lis(n)
+          lwt(ncnt) = lwt(n)
+        end if
+      end do
+      if (debug > 1) write (6, F02) ' rm dst grid points, nwts old/new = ', nwts, ncnt
+      nwts = ncnt
+    end if
 
-  !--- remove dst grid points based on src mask---
-  if (debug > 1) write(6,F01) 'maskdstbysrc: ',maskdstbysrc
-  if (maskdstbysrc) then
-    ncnt = 0
-    do n=1,nwts
-      call shr_map_1dto2d(lid(n),nid,njd,i,j)
-      if (Msrc(i,j) /= 0) then
-        ncnt = ncnt+1
-        lid(ncnt) = lid(n)
-        lis(ncnt) = lis(n)
-        lwt(ncnt) = lwt(n)
-      endif
-    enddo
-    if (debug > 1) write(6,F02) ' rm dst grid points by src, nwts old/new = ',nwts,ncnt
-    nwts = ncnt
-  endif
+    !--- remove dst grid points based on src mask---
+    if (debug > 1) write (6, F01) 'maskdstbysrc: ', maskdstbysrc
+    if (maskdstbysrc) then
+      ncnt = 0
+      do n = 1, nwts
+        call shr_map_1dto2d(lid(n), nid, njd, i, j)
+        if (Msrc(i, j) /= 0) then
+          ncnt = ncnt + 1
+          lid(ncnt) = lid(n)
+          lis(ncnt) = lis(n)
+          lwt(ncnt) = lwt(n)
+        end if
+      end do
+      if (debug > 1) write (6, F02) ' rm dst grid points by src, nwts old/new = ', nwts, ncnt
+      nwts = ncnt
+    end if
 
-  !--- remove src grid points ---
-  if (debug > 1) write(6,F01) 'masksrc: ',masksrc
-  if (masksrc) then
-    ncnt = 0
-    do n=1,nwts
-      call shr_map_1dto2d(lis(n),nis,njs,i,j)
-      if (Msrc(i,j) /= 0) then
-        ncnt = ncnt+1
-        lid(ncnt) = lid(n)
-        lis(ncnt) = lis(n)
-        lwt(ncnt) = lwt(n)
-      endif
-    enddo
-    if (debug > 1) write(6,F02) ' rm src grid points, nwts old/new = ',nwts,ncnt
-    nwts = ncnt
-  endif
-  
-  !--- renormalize wgts to 1.0 ---
-  allocate(sum(nid*njd))
-  !--- sum weights for dst grid points ---
-  sum(:) = c0
-  do n=1,nwts
-    sum(lid(n)) = sum(lid(n)) + lwt(n)
-  enddo
-  !--- print min/max sum ---
-  rmin = maxval(sum)
-  rmax = minval(sum)
-  do n=1,nid*njd
-    if (sum(n) > eps) then
-      rmin = min(rmin,sum(n))
-      rmax = max(rmax,sum(n))
-    endif
-  enddo
-  if (debug > 1) write(6,F03) 'sum wts min/max ',rmin,rmax
-  !--- renormalize so sum on destination is always 1.0 for active dst points
-  if (debug > 1) write(6,F01) 'renorm: ',renorm
-  if (renorm) then
-    do n=1,nwts
-      if (sum(lid(n)) > eps) then
-        lwt(n) = lwt(n) / sum(lid(n))
-      endif
-    enddo
+    !--- remove src grid points ---
+    if (debug > 1) write (6, F01) 'masksrc: ', masksrc
+    if (masksrc) then
+      ncnt = 0
+      do n = 1, nwts
+        call shr_map_1dto2d(lis(n), nis, njs, i, j)
+        if (Msrc(i, j) /= 0) then
+          ncnt = ncnt + 1
+          lid(ncnt) = lid(n)
+          lis(ncnt) = lis(n)
+          lwt(ncnt) = lwt(n)
+        end if
+      end do
+      if (debug > 1) write (6, F02) ' rm src grid points, nwts old/new = ', nwts, ncnt
+      nwts = ncnt
+    end if
+
+    !--- renormalize wgts to 1.0 ---
+    allocate (sum(nid*njd))
     !--- sum weights for dst grid points ---
     sum(:) = c0
-    do n=1,nwts
+    do n = 1, nwts
       sum(lid(n)) = sum(lid(n)) + lwt(n)
-    enddo
+    end do
     !--- print min/max sum ---
     rmin = maxval(sum)
     rmax = minval(sum)
-    do n=1,nid*njd
+    do n = 1, nid*njd
       if (sum(n) > eps) then
-        rmin = min(rmin,sum(n))
-        rmax = max(rmax,sum(n))
-      endif
-    enddo
-    if (debug > 1) write(6,F03) 'sum wts min/max ',rmin,rmax
-  endif
+        rmin = min(rmin, sum(n))
+        rmax = max(rmax, sum(n))
+      end if
+    end do
+    if (debug > 1) write (6, F03) 'sum wts min/max ', rmin, rmax
+    !--- renormalize so sum on destination is always 1.0 for active dst points
+    if (debug > 1) write (6, F01) 'renorm: ', renorm
+    if (renorm) then
+      do n = 1, nwts
+        if (sum(lid(n)) > eps) then
+          lwt(n) = lwt(n)/sum(lid(n))
+        end if
+      end do
+      !--- sum weights for dst grid points ---
+      sum(:) = c0
+      do n = 1, nwts
+        sum(lid(n)) = sum(lid(n)) + lwt(n)
+      end do
+      !--- print min/max sum ---
+      rmin = maxval(sum)
+      rmax = minval(sum)
+      do n = 1, nid*njd
+        if (sum(n) > eps) then
+          rmin = min(rmin, sum(n))
+          rmax = max(rmax, sum(n))
+        end if
+      end do
+      if (debug > 1) write (6, F03) 'sum wts min/max ', rmin, rmax
+    end if
 
-  map%nwts = nwts
+    map%nwts = nwts
 ! deallocate(map%idst,stat=irc)
 ! deallocate(map%isrc,stat=irc)
 ! deallocate(map%wgts,stat=irc)
-  allocate(map%idst(nwts))
-  allocate(map%isrc(nwts))
-  allocate(map%wgts(nwts))
-  do n=1,nwts
-    map%idst(n) = lid(n)
-    map%isrc(n) = lis(n)
-    map%wgts(n) = lwt(n)
-  enddo
+    allocate (map%idst(nwts))
+    allocate (map%isrc(nwts))
+    allocate (map%wgts(nwts))
+    do n = 1, nwts
+      map%idst(n) = lid(n)
+      map%isrc(n) = lis(n)
+      map%wgts(n) = lwt(n)
+    end do
 
-  deallocate(Xdst)
+    deallocate (Xdst)
 
-  deallocate(lis)
-  deallocate(lid)
-  deallocate(lwt)
-  deallocate(sum)
+    deallocate (lis)
+    deallocate (lid)
+    deallocate (lwt)
+    deallocate (sum)
 
-  deallocate(pti)
-  deallocate(ptj)
-  deallocate(ptw)
+    deallocate (pti)
+    deallocate (ptj)
+    deallocate (ptw)
 
-  map%fill = fillstring
-  call shr_map_checkWgts(Msrc,Mdst,map)
+    map%fill = fillstring
+    call shr_map_checkWgts(Msrc, Mdst, map)
 
-  if (present(rc)) rc = lrc
+    if (present(rc)) rc = lrc
 
-end subroutine shr_map_mapSet  
+  end subroutine shr_map_mapSet
 
 !===============================================================================
 !BOP ===========================================================================
@@ -1337,102 +1337,102 @@ end subroutine shr_map_mapSet
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_mapDatam(arrsrc,arrdst,map)
-  !--- map arrsrc to arrdst, each array is dimension (fields,grid index) ---
+  subroutine shr_map_mapDatam(arrsrc, arrdst, map)
+    !--- map arrsrc to arrdst, each array is dimension (fields,grid index) ---
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  real(SHR_KIND_R8)     ,intent(in) :: arrsrc(:,:)  ! src array(fields,grid)
-  real(SHR_KIND_R8)     ,intent(out):: arrdst(:,:)  ! dst array(fields,grid)
-  type(shr_map_mapType) ,intent(in) :: map      ! map
+    real(SHR_KIND_R8), intent(in) :: arrsrc(:, :)  ! src array(fields,grid)
+    real(SHR_KIND_R8), intent(out):: arrdst(:, :)  ! dst array(fields,grid)
+    type(shr_map_mapType), intent(in) :: map      ! map
 
 !EOP
 
-  !--- local ---
-  integer(SHR_KIND_IN) :: n,n2            ! counters
-  integer(SHR_KIND_IN) :: indi,indo       ! array indices, in/out
-  real(SHR_KIND_R8)    :: wgt             ! value of weight
-  integer(SHR_KIND_IN) :: nfi,nfo         ! number of fields in array, in/out
-  integer(SHR_KIND_IN) :: nsi,nso         ! size of grid in array, in/out
-  real(SHR_KIND_R8)    :: theta           ! angle difference
+    !--- local ---
+    integer(SHR_KIND_IN) :: n, n2            ! counters
+    integer(SHR_KIND_IN) :: indi, indo       ! array indices, in/out
+    real(SHR_KIND_R8)    :: wgt             ! value of weight
+    integer(SHR_KIND_IN) :: nfi, nfo         ! number of fields in array, in/out
+    integer(SHR_KIND_IN) :: nsi, nso         ! size of grid in array, in/out
+    real(SHR_KIND_R8)    :: theta           ! angle difference
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_mapDatam') "
-  character(*),parameter :: F00     = "('(shr_map_mapDatam) ',a) "
-  character(*),parameter :: F01     = "('(shr_map_mapDatam) ',a,2i8) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_mapDatam') "
+    character(*), parameter :: F00 = "('(shr_map_mapDatam) ',a) "
+    character(*), parameter :: F01 = "('(shr_map_mapDatam) ',a,2i8) "
 
 !-------------------------------------------------------------------------------
 
-  !--- get number of fields ---
-  nfi = size(arrsrc,1)
-  nfo = size(arrdst,1)
+    !--- get number of fields ---
+    nfi = size(arrsrc, 1)
+    nfo = size(arrdst, 1)
 
-  !--- check number of fields ---
-  if (nfi /= nfo) then
-    write(6,F01) ' field numbers dont match ',nfi,nfo
-    call shr_map_abort(subName//' ERROR number of fields')
-  endif
+    !--- check number of fields ---
+    if (nfi /= nfo) then
+      write (6, F01) ' field numbers dont match ', nfi, nfo
+      call shr_map_abort(subName//' ERROR number of fields')
+    end if
 
-  !--- check two fields for vector ---
-  if (trim(map%vect) == trim(shr_map_fs_vector).and.(nfi /= 2)) then
-    write(6,F01) ' vector mapping, must map only two fields',nfi,nfo
-    call shr_map_abort(subName//' ERROR vector mapping fields not two')
-  endif
+    !--- check two fields for vector ---
+    if (trim(map%vect) == trim(shr_map_fs_vector) .and. (nfi /= 2)) then
+      write (6, F01) ' vector mapping, must map only two fields', nfi, nfo
+      call shr_map_abort(subName//' ERROR vector mapping fields not two')
+    end if
 
-  !--- check that map is set ---
-  if (.not.shr_map_checkFilled(map)) then
-    call shr_map_abort(subName//' ERROR map is not filled')
-  endif
+    !--- check that map is set ---
+    if (.not. shr_map_checkFilled(map)) then
+      call shr_map_abort(subName//' ERROR map is not filled')
+    end if
 
-  !--- get size of grid ---
-  nsi = size(arrsrc,2)
-  nso = size(arrdst,2)
+    !--- get size of grid ---
+    nsi = size(arrsrc, 2)
+    nso = size(arrdst, 2)
 
-  !--- check size of grid ---
-  if (nsi /= map%nsrc) then
-    write(6,F01) ' src grid size doesnt match ',nsi,map%nsrc
-    call shr_map_abort(subName//' ERROR src grid size')
-  endif
-  if (nso /= map%ndst) then
-    write(6,F01) ' dst grid size doesnt match ',nso,map%ndst
-    call shr_map_abort(subName//' ERROR dst grid size')
-  endif
+    !--- check size of grid ---
+    if (nsi /= map%nsrc) then
+      write (6, F01) ' src grid size doesnt match ', nsi, map%nsrc
+      call shr_map_abort(subName//' ERROR src grid size')
+    end if
+    if (nso /= map%ndst) then
+      write (6, F01) ' dst grid size doesnt match ', nso, map%ndst
+      call shr_map_abort(subName//' ERROR dst grid size')
+    end if
 
-  !--- set arrdst to spval, all points, default ---
-  arrdst = shr_map_spval
+    !--- set arrdst to spval, all points, default ---
+    arrdst = shr_map_spval
 
-  !--- zero out output array only where field is computed ---  
-  do n=1,map%nwts
-    indo = map%idst(n)
-    arrdst(1:nfo,indo) = c0
-  enddo
-
-  !--- generate output array ---
-  if (trim(map%vect) == trim(shr_map_fs_vector)) then
-    do n=1,map%nwts
-      indi = map%isrc(n)
+    !--- zero out output array only where field is computed ---
+    do n = 1, map%nwts
       indo = map%idst(n)
-      wgt  = map%wgts(n)
-      theta = map%xdst(indo) - map%xsrc(indi)
-      arrdst(1,indo) = arrdst(1,indo) + wgt*( arrsrc(1,indi)*cos(theta)  &
-                                             +arrsrc(2,indi)*sin(theta))
-      arrdst(2,indo) = arrdst(2,indo) + wgt*(-arrsrc(1,indi)*sin(theta)  &
-                                             +arrsrc(2,indi)*cos(theta))
-    enddo
-  else
-    do n=1,map%nwts
-      indi = map%isrc(n)
-      indo = map%idst(n)
-      wgt  = map%wgts(n)
-      do n2 = 1,nfo
-        arrdst(n2,indo) = arrdst(n2,indo) + arrsrc(n2,indi)*wgt
-      enddo
-    enddo
-  endif
+      arrdst(1:nfo, indo) = c0
+    end do
 
-end subroutine shr_map_mapDatam
+    !--- generate output array ---
+    if (trim(map%vect) == trim(shr_map_fs_vector)) then
+      do n = 1, map%nwts
+        indi = map%isrc(n)
+        indo = map%idst(n)
+        wgt = map%wgts(n)
+        theta = map%xdst(indo) - map%xsrc(indi)
+        arrdst(1, indo) = arrdst(1, indo) + wgt*(arrsrc(1, indi)*cos(theta) &
+                                                 + arrsrc(2, indi)*sin(theta))
+        arrdst(2, indo) = arrdst(2, indo) + wgt*(-arrsrc(1, indi)*sin(theta) &
+                                                 + arrsrc(2, indi)*cos(theta))
+      end do
+    else
+      do n = 1, map%nwts
+        indi = map%isrc(n)
+        indo = map%idst(n)
+        wgt = map%wgts(n)
+        do n2 = 1, nfo
+          arrdst(n2, indo) = arrdst(n2, indo) + arrsrc(n2, indi)*wgt
+        end do
+      end do
+    end if
+
+  end subroutine shr_map_mapDatam
 
 !===============================================================================
 !BOP ===========================================================================
@@ -1449,59 +1449,59 @@ end subroutine shr_map_mapDatam
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_mapDatanm(arrsrc,arrdst,Xsrc,Ysrc,Msrc,Xdst,Ydst,Mdst,name,type,algo,mask,vect,rc)
+  subroutine shr_map_mapDatanm(arrsrc, arrdst, Xsrc, Ysrc, Msrc, Xdst, Ydst, Mdst, name, type, algo, mask, vect, rc)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  !--- map arrsrc to arrdst, each array is dimension (fields,grid index) ---
-  real(SHR_KIND_R8)     ,intent(in) :: arrsrc(:,:)  ! src array(fields,grid)
-  real(SHR_KIND_R8)     ,intent(out):: arrdst(:,:)  ! dst array(fields,grid)
-  real(SHR_KIND_R8)     ,intent(in) :: Xsrc(:,:)  ! lon of src grid
-  real(SHR_KIND_R8)     ,intent(in) :: Ysrc(:,:)  ! lat of src grid
-  integer(SHR_KIND_IN)  ,intent(in) :: Msrc(:,:)  ! mask of src grid
-  real(SHR_KIND_R8)     ,intent(in) :: Xdst(:,:)  ! lon of dst grid
-  real(SHR_KIND_R8)     ,intent(in) :: Ydst(:,:)  ! lat of dst grid
-  integer(SHR_KIND_IN)  ,intent(in) :: Mdst(:,:)  ! mask of dst grid
-  character(*)          ,intent(in) :: name       ! name
-  character(*)          ,intent(in) :: type       ! type
-  character(*)          ,intent(in) :: algo       ! algo
-  character(*)          ,intent(in) :: mask       ! mask
-  character(*) ,optional,intent(in) :: vect       ! vect
-  integer(SHR_KIND_IN),optional,intent(out) :: rc ! error code
+    !--- map arrsrc to arrdst, each array is dimension (fields,grid index) ---
+    real(SHR_KIND_R8), intent(in) :: arrsrc(:, :)  ! src array(fields,grid)
+    real(SHR_KIND_R8), intent(out):: arrdst(:, :)  ! dst array(fields,grid)
+    real(SHR_KIND_R8), intent(in) :: Xsrc(:, :)  ! lon of src grid
+    real(SHR_KIND_R8), intent(in) :: Ysrc(:, :)  ! lat of src grid
+    integer(SHR_KIND_IN), intent(in) :: Msrc(:, :)  ! mask of src grid
+    real(SHR_KIND_R8), intent(in) :: Xdst(:, :)  ! lon of dst grid
+    real(SHR_KIND_R8), intent(in) :: Ydst(:, :)  ! lat of dst grid
+    integer(SHR_KIND_IN), intent(in) :: Mdst(:, :)  ! mask of dst grid
+    character(*), intent(in) :: name       ! name
+    character(*), intent(in) :: type       ! type
+    character(*), intent(in) :: algo       ! algo
+    character(*), intent(in) :: mask       ! mask
+    character(*), optional, intent(in) :: vect       ! vect
+    integer(SHR_KIND_IN), optional, intent(out) :: rc ! error code
 
 !EOP
 
-  !--- local ---
-  type(shr_map_mapType) :: map
-  integer(SHR_KIND_IN)  :: lrc
+    !--- local ---
+    type(shr_map_mapType) :: map
+    integer(SHR_KIND_IN)  :: lrc
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_mapDatanm') "
-  character(*),parameter :: F00     = "('(shr_map_mapDatanm) ',a) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_mapDatanm') "
+    character(*), parameter :: F00 = "('(shr_map_mapDatanm) ',a) "
 
 !-------------------------------------------------------------------------------
 
-  lrc = 0
+    lrc = 0
 
-  call shr_map_put(map,shr_map_fs_name,name,verify=.false.)
-  call shr_map_put(map,shr_map_fs_type,type,verify=.true.)
-  call shr_map_put(map,shr_map_fs_algo,algo,verify=.true.)
-  call shr_map_put(map,shr_map_fs_mask,mask,verify=.true.)
-  if (present(vect)) then
-    call shr_map_put(map,shr_map_fs_vect,vect,verify=.true.)
-  else
-    call shr_map_put(map,shr_map_fs_vect,'scalar',verify=.true.)
-  endif
-  call shr_map_mapSet(map,Xsrc,Ysrc,Msrc,Xdst,Ydst,Mdst,rc=lrc)
-  call shr_map_mapData(arrsrc,arrdst,map)
+    call shr_map_put(map, shr_map_fs_name, name, verify=.false.)
+    call shr_map_put(map, shr_map_fs_type, type, verify=.true.)
+    call shr_map_put(map, shr_map_fs_algo, algo, verify=.true.)
+    call shr_map_put(map, shr_map_fs_mask, mask, verify=.true.)
+    if (present(vect)) then
+      call shr_map_put(map, shr_map_fs_vect, vect, verify=.true.)
+    else
+      call shr_map_put(map, shr_map_fs_vect, 'scalar', verify=.true.)
+    end if
+    call shr_map_mapSet(map, Xsrc, Ysrc, Msrc, Xdst, Ydst, Mdst, rc=lrc)
+    call shr_map_mapData(arrsrc, arrdst, map)
 
-  call shr_map_clean(map)
+    call shr_map_clean(map)
 
-  if (present(rc)) rc = lrc
+    if (present(rc)) rc = lrc
 
-end subroutine shr_map_mapDatanm
+  end subroutine shr_map_mapDatanm
 
 !===============================================================================
 !BOP ===========================================================================
@@ -1519,27 +1519,27 @@ end subroutine shr_map_mapDatanm
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_setAbort(flag)
+  subroutine shr_map_setAbort(flag)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  logical,intent(in) :: flag
+    logical, intent(in) :: flag
 
 !EOP
 
-  !--- local ---
+    !--- local ---
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_setAbort') "
-  character(*),parameter :: F00     = "('(shr_map_setAbort) ',a) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_setAbort') "
+    character(*), parameter :: F00 = "('(shr_map_setAbort) ',a) "
 
 !-------------------------------------------------------------------------------
 
-  doabort = flag
+    doabort = flag
 
-end subroutine shr_map_setAbort
+  end subroutine shr_map_setAbort
 
 !===============================================================================
 !BOP ===========================================================================
@@ -1556,27 +1556,27 @@ end subroutine shr_map_setAbort
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_setDebug(iflag)
+  subroutine shr_map_setDebug(iflag)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  integer,intent(in) :: iflag
+    integer, intent(in) :: iflag
 
 !EOP
 
-  !--- local ---
+    !--- local ---
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_setDebug') "
-  character(*),parameter :: F00     = "('(shr_map_setDebug) ',a) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_setDebug') "
+    character(*), parameter :: F00 = "('(shr_map_setDebug) ',a) "
 
 !-------------------------------------------------------------------------------
 
-  debug = iflag
+    debug = iflag
 
-end subroutine shr_map_setDebug
+  end subroutine shr_map_setDebug
 
 !===============================================================================
 !XXBOP ===========================================================================
@@ -1594,35 +1594,35 @@ end subroutine shr_map_setDebug
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_abort(string)
+  subroutine shr_map_abort(string)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  character(*),optional,intent(in) :: string
+    character(*), optional, intent(in) :: string
 
 !XXEOP
 
-  !--- local ---
-  character(shr_kind_CL) :: lstring
+    !--- local ---
+    character(shr_kind_CL) :: lstring
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_abort') "
-  character(*),parameter :: F00     = "('(shr_map_abort) ',a) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_abort') "
+    character(*), parameter :: F00 = "('(shr_map_abort) ',a) "
 
 !-------------------------------------------------------------------------------
 
-  lstring = ''
-  if (present(string)) lstring = string
+    lstring = ''
+    if (present(string)) lstring = string
 
-  if (doabort) then
-    call shr_sys_abort(lstring)
-  else
-    write(6,F00) trim(lstring)
-  endif
+    if (doabort) then
+      call shr_sys_abort(lstring)
+    else
+      write (6, F00) trim(lstring)
+    end if
 
-end subroutine shr_map_abort
+  end subroutine shr_map_abort
 
 !===============================================================================
 !XXBOP ===========================================================================
@@ -1639,179 +1639,179 @@ end subroutine shr_map_abort
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_checkGrids(Xsrc,Ysrc,Msrc,Xdst,Ydst,Mdst,map,rc)
+  subroutine shr_map_checkGrids(Xsrc, Ysrc, Msrc, Xdst, Ydst, Mdst, map, rc)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
-  real(SHR_KIND_R8)    ,intent(in) :: Xsrc(:,:)   ! src lat
-  real(SHR_KIND_R8)    ,intent(in) :: Ysrc(:,:)   ! src lon
-  integer(SHR_KIND_IN) ,intent(in) :: Msrc(:,:)   ! src mask
-  real(SHR_KIND_R8)    ,intent(in) :: Xdst(:,:)   ! dst lat
-  real(SHR_KIND_R8)    ,intent(in) :: Ydst(:,:)   ! dst lon
-  integer(SHR_KIND_IN) ,intent(in) :: Mdst(:,:)   ! dst mask
-  type(shr_map_mapType),intent(in) :: map     ! map
-  integer(SHR_KIND_IN),optional,intent(out) :: rc ! error code
+    real(SHR_KIND_R8), intent(in) :: Xsrc(:, :)   ! src lat
+    real(SHR_KIND_R8), intent(in) :: Ysrc(:, :)   ! src lon
+    integer(SHR_KIND_IN), intent(in) :: Msrc(:, :)   ! src mask
+    real(SHR_KIND_R8), intent(in) :: Xdst(:, :)   ! dst lat
+    real(SHR_KIND_R8), intent(in) :: Ydst(:, :)   ! dst lon
+    integer(SHR_KIND_IN), intent(in) :: Mdst(:, :)   ! dst mask
+    type(shr_map_mapType), intent(in) :: map     ! map
+    integer(SHR_KIND_IN), optional, intent(out) :: rc ! error code
 
 !XXEOP
 
-  !--- local ---
-  integer(SHR_KIND_IN) :: i,j,nis,njs,nid,njd,ncnt
-  logical              :: error,flag
+    !--- local ---
+    integer(SHR_KIND_IN) :: i, j, nis, njs, nid, njd, ncnt
+    logical              :: error, flag
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_checkGrids') "
-  character(*),parameter :: F00     = "('(shr_map_checkGrids) ',a) "
-  character(*),parameter :: F01     = "('(shr_map_checkGrids) ',a,2i8) "
-  character(*),parameter :: F02     = "('(shr_map_checkGrids) ',a,4i8) "
-  character(*),parameter :: F03     = "('(shr_map_checkGrids) ',a,2g20.13) "
-  character(*),parameter :: F04     = "('(shr_map_checkGrids) ',a,i8,a,i8) "
-  character(*),parameter :: F05     = "('(shr_map_checkGrids) ',a,i8,2g20.13) "
-  character(*),parameter :: F06     = "('(shr_map_checkGrids) ',a,2i8,2g20.13) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_checkGrids') "
+    character(*), parameter :: F00 = "('(shr_map_checkGrids) ',a) "
+    character(*), parameter :: F01 = "('(shr_map_checkGrids) ',a,2i8) "
+    character(*), parameter :: F02 = "('(shr_map_checkGrids) ',a,4i8) "
+    character(*), parameter :: F03 = "('(shr_map_checkGrids) ',a,2g20.13) "
+    character(*), parameter :: F04 = "('(shr_map_checkGrids) ',a,i8,a,i8) "
+    character(*), parameter :: F05 = "('(shr_map_checkGrids) ',a,i8,2g20.13) "
+    character(*), parameter :: F06 = "('(shr_map_checkGrids) ',a,2i8,2g20.13) "
 
 !-------------------------------------------------------------------------------
 
-  error = .false.
-  if (present(rc)) rc = 0
+    error = .false.
+    if (present(rc)) rc = 0
 
-  !--- get size of X arrays
-  nis = size(Xsrc,1)
-  njs = size(Xsrc,2)
-  nid = size(Xdst,1)
-  njd = size(Xdst,2)
+    !--- get size of X arrays
+    nis = size(Xsrc, 1)
+    njs = size(Xsrc, 2)
+    nid = size(Xdst, 1)
+    njd = size(Xdst, 2)
 
-  !--- check array size consistency for src and dst
-  if (size(Ysrc,1) /= nis) then
-    write(6,F01) 'ERROR Xsrc,Ysrc i-dim mismatch',nis,size(Ysrc,1)
-    error = .true.
-  endif
-  if (size(Ysrc,2) /= njs) then
-    write(6,F01) 'ERROR Xsrc,Ysrc j-dim mismatch',njs,size(Ysrc,2)
-    error = .true.
-  endif
-  if (size(Msrc,1) /= nis) then
-    write(6,F01) 'ERROR Xsrc,Msrc i-dim mismatch',nis,size(Msrc,1)
-    error = .true.
-  endif
-  if (size(Msrc,2) /= njs) then
-    write(6,F01) 'ERROR Xsrc,Msrc j-dim mismatch',njs,size(Msrc,2)
-    error = .true.
-  endif
-  if (size(Ydst,1) /= nid) then
-    write(6,F01) 'ERROR Xdst,Ydst i-dim mismatch',nid,size(Ydst,1)
-    error = .true.
-  endif
-  if (size(Ydst,2) /= njd) then
-    write(6,F01) 'ERROR Xdst,Ydst j-dim mismatch',njd,size(Ydst,2)
-    error = .true.
-  endif
-  if (size(Mdst,1) /= nid) then
-    write(6,F01) 'ERROR Xdst,Mdst i-dim mismatch',nid,size(Mdst,1)
-    error = .true.
-  endif
-  if (size(Mdst,2) /= njd) then
-    write(6,F01) 'ERROR Xdst,Mdst j-dim mismatch',njd,size(Mdst,2)
-    error = .true.
-  endif
-
-  !--- fill type must have same grid size on src and dst ---
-  if (trim(map%type) == trim(shr_map_fs_fill)) then
-    if (nis /= nid .or. njs /= njd) then
-      write(6,F02) 'ERROR: fill type, src/dst sizes ',nis,nid,njs,njd
+    !--- check array size consistency for src and dst
+    if (size(Ysrc, 1) /= nis) then
+      write (6, F01) 'ERROR Xsrc,Ysrc i-dim mismatch', nis, size(Ysrc, 1)
       error = .true.
-    endif
-  endif
+    end if
+    if (size(Ysrc, 2) /= njs) then
+      write (6, F01) 'ERROR Xsrc,Ysrc j-dim mismatch', njs, size(Ysrc, 2)
+      error = .true.
+    end if
+    if (size(Msrc, 1) /= nis) then
+      write (6, F01) 'ERROR Xsrc,Msrc i-dim mismatch', nis, size(Msrc, 1)
+      error = .true.
+    end if
+    if (size(Msrc, 2) /= njs) then
+      write (6, F01) 'ERROR Xsrc,Msrc j-dim mismatch', njs, size(Msrc, 2)
+      error = .true.
+    end if
+    if (size(Ydst, 1) /= nid) then
+      write (6, F01) 'ERROR Xdst,Ydst i-dim mismatch', nid, size(Ydst, 1)
+      error = .true.
+    end if
+    if (size(Ydst, 2) /= njd) then
+      write (6, F01) 'ERROR Xdst,Ydst j-dim mismatch', njd, size(Ydst, 2)
+      error = .true.
+    end if
+    if (size(Mdst, 1) /= nid) then
+      write (6, F01) 'ERROR Xdst,Mdst i-dim mismatch', nid, size(Mdst, 1)
+      error = .true.
+    end if
+    if (size(Mdst, 2) /= njd) then
+      write (6, F01) 'ERROR Xdst,Mdst j-dim mismatch', njd, size(Mdst, 2)
+      error = .true.
+    end if
 
-  !--- write min/max or X, Y and M count ---
-  if (debug > 1) then
-    write(6,F03) ' Xsrc min/max ',minval(Xsrc),maxval(Xsrc)
-    write(6,F03) ' Ysrc min/max ',minval(Ysrc),maxval(Ysrc)
-    write(6,F03) ' Xdst min/max ',minval(Xdst),maxval(Xdst)
-    write(6,F03) ' Ydst min/max ',minval(Ydst),maxval(Ydst)
-  endif
-
-  ncnt = 0
-  do j=1,njs
-  do i=1,nis
-    if (Msrc(i,j) == 0) ncnt = ncnt + 1
-  enddo
-  enddo
-  if (debug > 1) write(6,F04) ' Msrc mask T ',nis*njs-ncnt,' of ',nis*njs
-
-  ncnt = 0
-  do j=1,njd
-  do i=1,nid
-    if (Mdst(i,j) == 0) ncnt = ncnt + 1
-  enddo
-  enddo
-  if (debug > 1) write(6,F04) ' Mdst mask T ',nid*njd-ncnt,' of ',nid*njd
-
-  if (trim(map%algo) == trim(shr_map_fs_bilinear)) then
-
-    !--- check that Xsrc is monotonically increasing for bilinear ---
-    flag = .false.
-    i = 1
-    do while (i < nis .and. .not.flag)
-      if (Xsrc(i+1,1) <=  Xsrc(i,1)) then
-        write(6,F05) 'ERROR Xsrc not increasing ',i,Xsrc(i+1,1),Xsrc(i,1)
-        flag = .true.
+    !--- fill type must have same grid size on src and dst ---
+    if (trim(map%type) == trim(shr_map_fs_fill)) then
+      if (nis /= nid .or. njs /= njd) then
+        write (6, F02) 'ERROR: fill type, src/dst sizes ', nis, nid, njs, njd
         error = .true.
-      endif
-      i = i+1
-    enddo
+      end if
+    end if
 
-    !--- check that Ysrc is monotonically increasing for bilinear ---
-    flag = .false.
-    j = 1
-    do while (j < njs .and. .not.flag)
-      if (Ysrc(1,j+1) <=  Ysrc(1,j)) then
-        write(6,F05) 'ERROR Ysrc not increasing ',i,Ysrc(1,j+1),Ysrc(1,j)
-        flag = .true.
-        error = .true.
-      endif
-      j = j+1
-    enddo
+    !--- write min/max or X, Y and M count ---
+    if (debug > 1) then
+      write (6, F03) ' Xsrc min/max ', minval(Xsrc), maxval(Xsrc)
+      write (6, F03) ' Ysrc min/max ', minval(Ysrc), maxval(Ysrc)
+      write (6, F03) ' Xdst min/max ', minval(Xdst), maxval(Xdst)
+      write (6, F03) ' Ydst min/max ', minval(Ydst), maxval(Ydst)
+    end if
 
-    !--- check that Xsrc and Ysrc are regular lat/lon grids for bilinear
-    flag = .false.
-    i = 1
-    do while (i < nis .and. .not.flag)
-      j = 2
-      do while (j < njs .and. .not.flag)
-        if (abs(Xsrc(i,j)-Xsrc(i,1)) > eps) then
-          write(6,F06) ' ERROR Xsrc not regular lat,lon ',i,j, &
-              Xsrc(i,j),Xsrc(1,j)
+    ncnt = 0
+    do j = 1, njs
+    do i = 1, nis
+      if (Msrc(i, j) == 0) ncnt = ncnt + 1
+    end do
+    end do
+    if (debug > 1) write (6, F04) ' Msrc mask T ', nis*njs - ncnt, ' of ', nis*njs
+
+    ncnt = 0
+    do j = 1, njd
+    do i = 1, nid
+      if (Mdst(i, j) == 0) ncnt = ncnt + 1
+    end do
+    end do
+    if (debug > 1) write (6, F04) ' Mdst mask T ', nid*njd - ncnt, ' of ', nid*njd
+
+    if (trim(map%algo) == trim(shr_map_fs_bilinear)) then
+
+      !--- check that Xsrc is monotonically increasing for bilinear ---
+      flag = .false.
+      i = 1
+      do while (i < nis .and. .not. flag)
+        if (Xsrc(i + 1, 1) <= Xsrc(i, 1)) then
+          write (6, F05) 'ERROR Xsrc not increasing ', i, Xsrc(i + 1, 1), Xsrc(i, 1)
           flag = .true.
           error = .true.
-        endif
-        j = j+1
-      enddo
-      i = i+1
-    enddo
+        end if
+        i = i + 1
+      end do
 
-    flag = .false.
-    j = 1
-    do while (j < njs .and. .not.flag)
-      i = 2
-      do while (i < nis .and. .not.flag)
-        if (abs(Ysrc(i,j)-Ysrc(1,j)) > eps) then
-          write(6,F06) ' ERROR Ysrc not regular lat,lon ',i,j, &
-            Ysrc(i,j),Ysrc(1,j)
+      !--- check that Ysrc is monotonically increasing for bilinear ---
+      flag = .false.
+      j = 1
+      do while (j < njs .and. .not. flag)
+        if (Ysrc(1, j + 1) <= Ysrc(1, j)) then
+          write (6, F05) 'ERROR Ysrc not increasing ', i, Ysrc(1, j + 1), Ysrc(1, j)
           flag = .true.
           error = .true.
-        endif
-        i = i+1
-      enddo
-      j = j+1
-    enddo
-  endif
+        end if
+        j = j + 1
+      end do
 
-  if (error) then
-    call shr_map_abort(subName//' ERROR ')
-    if (present(rc)) rc = 1
-  endif
+      !--- check that Xsrc and Ysrc are regular lat/lon grids for bilinear
+      flag = .false.
+      i = 1
+      do while (i < nis .and. .not. flag)
+        j = 2
+        do while (j < njs .and. .not. flag)
+          if (abs(Xsrc(i, j) - Xsrc(i, 1)) > eps) then
+            write (6, F06) ' ERROR Xsrc not regular lat,lon ', i, j, &
+              Xsrc(i, j), Xsrc(1, j)
+            flag = .true.
+            error = .true.
+          end if
+          j = j + 1
+        end do
+        i = i + 1
+      end do
 
-end subroutine shr_map_checkGrids
+      flag = .false.
+      j = 1
+      do while (j < njs .and. .not. flag)
+        i = 2
+        do while (i < nis .and. .not. flag)
+          if (abs(Ysrc(i, j) - Ysrc(1, j)) > eps) then
+            write (6, F06) ' ERROR Ysrc not regular lat,lon ', i, j, &
+              Ysrc(i, j), Ysrc(1, j)
+            flag = .true.
+            error = .true.
+          end if
+          i = i + 1
+        end do
+        j = j + 1
+      end do
+    end if
+
+    if (error) then
+      call shr_map_abort(subName//' ERROR ')
+      if (present(rc)) rc = 1
+    end if
+
+  end subroutine shr_map_checkGrids
 
 !===============================================================================
 !XXBOP ===========================================================================
@@ -1828,138 +1828,138 @@ end subroutine shr_map_checkGrids
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_checkWgts(Msrc,Mdst,map)
+  subroutine shr_map_checkWgts(Msrc, Mdst, map)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
-  integer(SHR_KIND_IN) ,intent(in) :: Msrc(:,:)  ! src mask
-  integer(SHR_KIND_IN) ,intent(in) :: Mdst(:,:)  ! dst mask
-  type(shr_map_mapType),intent(in) :: map        ! map
+    integer(SHR_KIND_IN), intent(in) :: Msrc(:, :)  ! src mask
+    integer(SHR_KIND_IN), intent(in) :: Mdst(:, :)  ! dst mask
+    type(shr_map_mapType), intent(in) :: map        ! map
 
 !XXEOP
 
-  !--- local ---
-  integer(SHR_KIND_IN) :: i,j,nis,njs,nid,njd,n
-  integer(SHR_KIND_IN) :: ic1,ic2,ic3,ic4,ic5     ! counters
-  logical              :: error
-  real(SHR_KIND_R8),allocatable :: Csrc(:,:)
-  real(SHR_KIND_R8),allocatable :: Cdst(:,:)
+    !--- local ---
+    integer(SHR_KIND_IN) :: i, j, nis, njs, nid, njd, n
+    integer(SHR_KIND_IN) :: ic1, ic2, ic3, ic4, ic5     ! counters
+    logical              :: error
+    real(SHR_KIND_R8), allocatable :: Csrc(:, :)
+    real(SHR_KIND_R8), allocatable :: Cdst(:, :)
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_checkWgts') "
-  character(*),parameter :: F00     = "('(shr_map_checkWgts) ',a) "
-  character(*),parameter :: F01     = "('(shr_map_checkWgts) ',a,i8) "
-  character(*),parameter :: F02     = "('(shr_map_checkWgts) ',a,3i8) "
-  character(*),parameter :: F03     = "('(shr_map_checkWgts) ',a,i8,a) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_checkWgts') "
+    character(*), parameter :: F00 = "('(shr_map_checkWgts) ',a) "
+    character(*), parameter :: F01 = "('(shr_map_checkWgts) ',a,i8) "
+    character(*), parameter :: F02 = "('(shr_map_checkWgts) ',a,3i8) "
+    character(*), parameter :: F03 = "('(shr_map_checkWgts) ',a,i8,a) "
 
 !-------------------------------------------------------------------------------
 
-  error = .false.
+    error = .false.
 
-  if (debug > 0) call shr_map_print(map)
+    if (debug > 0) call shr_map_print(map)
 
-  if (map%nwts < 1 .or. size(map%wgts) /= map%nwts &
-                  .or. size(map%isrc) /= map%nwts &
-                  .or. size(map%idst) /= map%nwts) then
-    call shr_map_abort(subName//' ERROR map not filled properly')
-  endif
+    if (map%nwts < 1 .or. size(map%wgts) /= map%nwts &
+        .or. size(map%isrc) /= map%nwts &
+        .or. size(map%idst) /= map%nwts) then
+      call shr_map_abort(subName//' ERROR map not filled properly')
+    end if
 
-  !--- get size of X arrays
-  nis = size(Msrc,1)
-  njs = size(Msrc,2)
-  nid = size(Mdst,1)
-  njd = size(Mdst,2)
+    !--- get size of X arrays
+    nis = size(Msrc, 1)
+    njs = size(Msrc, 2)
+    nid = size(Mdst, 1)
+    njd = size(Mdst, 2)
 
-  allocate(Csrc(nis,njs))
-  allocate(Cdst(nid,njd))
+    allocate (Csrc(nis, njs))
+    allocate (Cdst(nid, njd))
 
-  Csrc = c0
-  Cdst = c0
+    Csrc = c0
+    Cdst = c0
 
-  do n = 1,map%nwts
-    call shr_map_1dto2d(map%isrc(n),nis,njs,i,j)
-    Csrc(i,j) = c1
-    call shr_map_1dto2d(map%idst(n),nid,njd,i,j)
-    Cdst(i,j) = Cdst(i,j) + map%wgts(n)
-  enddo
+    do n = 1, map%nwts
+      call shr_map_1dto2d(map%isrc(n), nis, njs, i, j)
+      Csrc(i, j) = c1
+      call shr_map_1dto2d(map%idst(n), nid, njd, i, j)
+      Cdst(i, j) = Cdst(i, j) + map%wgts(n)
+    end do
 
-  ic1 = 0
-  ic2 = 0
-  ic3 = 0
-  ic4 = 0
-  ic5 = 0
-  do j=1,njs
-  do i=1,nis
-    if (Msrc(i,j) /= 0) then   ! live src pt
-      if (abs(Csrc(i,j)-c1) < eps) then
-        ic1 = ic1 + 1          ! in use
-      else
-        ic2 = ic2 + 1          ! not used
-      endif
-    else                       ! dead src pt
-      if (abs(Csrc(i,j)-c1) < eps) then
-        ic3 = ic3 + 1          ! in use
-      else
-        ic5 = ic5 + 1          ! not used
-      endif
-    endif
-  enddo
-  enddo
+    ic1 = 0
+    ic2 = 0
+    ic3 = 0
+    ic4 = 0
+    ic5 = 0
+    do j = 1, njs
+    do i = 1, nis
+      if (Msrc(i, j) /= 0) then   ! live src pt
+        if (abs(Csrc(i, j) - c1) < eps) then
+          ic1 = ic1 + 1          ! in use
+        else
+          ic2 = ic2 + 1          ! not used
+        end if
+      else                       ! dead src pt
+        if (abs(Csrc(i, j) - c1) < eps) then
+          ic3 = ic3 + 1          ! in use
+        else
+          ic5 = ic5 + 1          ! not used
+        end if
+      end if
+    end do
+    end do
 ! if (ic3 > 0) error = .true.
-  if (debug > 0) then
-    write(6,F01) ' total number of SRC points           : ',nis*njs
-    write(6,F01) ' wgts from SRC TRUE  points; used     : ',ic1
-    write(6,F01) ' wgts from SRC TRUE  points; not used : ',ic2
-    write(6,F01) ' wgts from SRC FALSE points; used     : ',ic3
-    write(6,F01) ' wgts from SRC FALSE points; not used : ',ic5
-  endif
+    if (debug > 0) then
+      write (6, F01) ' total number of SRC points           : ', nis*njs
+      write (6, F01) ' wgts from SRC TRUE  points; used     : ', ic1
+      write (6, F01) ' wgts from SRC TRUE  points; not used : ', ic2
+      write (6, F01) ' wgts from SRC FALSE points; used     : ', ic3
+      write (6, F01) ' wgts from SRC FALSE points; not used : ', ic5
+    end if
 
-  ic1 = 0
-  ic2 = 0
-  ic3 = 0
-  ic4 = 0
-  ic5 = 0
-  do j=1,njd
-  do i=1,nid
-    if (Mdst(i,j) /= 0) then   ! wgts should sum to one
-      if (abs(Cdst(i,j)-c1) < eps) then
-        ic1 = ic1 + 1          ! wgts sum to one
-      else
-        ic2 = ic2 + 1          ! invalid wgts
-      endif
-    else                       ! wgts should sum to one or zero
-      if (abs(Cdst(i,j)-c1) < eps) then
-        ic3 = ic3 + 1          ! wgts sum to one
-      elseif (abs(Cdst(i,j)) < eps) then
-        ic4 = ic4 + 1          ! wgts sum to zero
-      else
-        ic5 = ic5 + 1          ! invalid wgts
-      endif
-    endif
-  enddo
-  enddo
+    ic1 = 0
+    ic2 = 0
+    ic3 = 0
+    ic4 = 0
+    ic5 = 0
+    do j = 1, njd
+    do i = 1, nid
+      if (Mdst(i, j) /= 0) then   ! wgts should sum to one
+        if (abs(Cdst(i, j) - c1) < eps) then
+          ic1 = ic1 + 1          ! wgts sum to one
+        else
+          ic2 = ic2 + 1          ! invalid wgts
+        end if
+      else                       ! wgts should sum to one or zero
+        if (abs(Cdst(i, j) - c1) < eps) then
+          ic3 = ic3 + 1          ! wgts sum to one
+        elseif (abs(Cdst(i, j)) < eps) then
+          ic4 = ic4 + 1          ! wgts sum to zero
+        else
+          ic5 = ic5 + 1          ! invalid wgts
+        end if
+      end if
+    end do
+    end do
 ! if (ic2 > 0) error = .true.
 ! if (ic5 > 0) error = .true.
-  if (debug > 0) then
-    write(6,F01) ' total number of DST points           : ',nid*njd
-    write(6,F01) ' sum wgts for DST TRUE  points; one   : ',ic1
-    if (ic2 > 0) then
-      write(6,F03) ' sum wgts for DST TRUE  points; not   : ',ic2,' **-WARNING-**'
-    else
-      write(6,F01) ' sum wgts for DST TRUE  points; not   : ',ic2
-    endif
-    write(6,F01) ' sum wgts for DST FALSE points; one   : ',ic3
-    write(6,F01) ' sum wgts for DST FALSE points; zero  : ',ic4
-    write(6,F01) ' sum wgts for DST FALSE points; not   : ',ic5
-  endif
+    if (debug > 0) then
+      write (6, F01) ' total number of DST points           : ', nid*njd
+      write (6, F01) ' sum wgts for DST TRUE  points; one   : ', ic1
+      if (ic2 > 0) then
+        write (6, F03) ' sum wgts for DST TRUE  points; not   : ', ic2, ' **-WARNING-**'
+      else
+        write (6, F01) ' sum wgts for DST TRUE  points; not   : ', ic2
+      end if
+      write (6, F01) ' sum wgts for DST FALSE points; one   : ', ic3
+      write (6, F01) ' sum wgts for DST FALSE points; zero  : ', ic4
+      write (6, F01) ' sum wgts for DST FALSE points; not   : ', ic5
+    end if
 
-  deallocate(Csrc)
-  deallocate(Cdst)
+    deallocate (Csrc)
+    deallocate (Cdst)
 
-  if (error) call shr_map_abort(subName//' ERROR invalid weights')
+    if (error) call shr_map_abort(subName//' ERROR invalid weights')
 
-end subroutine shr_map_checkWgts
+  end subroutine shr_map_checkWgts
 
 !===============================================================================
 !XXBOP ===========================================================================
@@ -1972,7 +1972,7 @@ end subroutine shr_map_checkWgts
 !
 ! !REMARKS:
 !     Assumes Xsrc,Ysrc are regular lat/lon grids, monotonicallly increasing
-!        on constant latitude and longitude lines.  
+!        on constant latitude and longitude lines.
 !     Assumes Xdst,Ydst,Xsrc,Ysrc are all either radians or degrees
 !
 ! !REVISION HISTORY:
@@ -1980,489 +1980,489 @@ end subroutine shr_map_checkWgts
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_map_getWts(Xdst,Ydst,Xsrc,Ysrc,pti,ptj,ptw,pnum)
+  subroutine shr_map_getWts(Xdst, Ydst, Xsrc, Ysrc, pti, ptj, ptw, pnum)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
 !XXEOP
 
-  real(SHR_KIND_R8)   ,intent(in) :: Xdst,Ydst
-  real(SHR_KIND_R8)   ,intent(in) :: Xsrc(:,:),Ysrc(:,:)
-  integer(SHR_KIND_IN),intent(out):: pti(:),ptj(:)
-  real(SHR_KIND_R8)   ,intent(out):: ptw(:)
-  integer(SHR_KIND_IN),intent(out):: pnum
+    real(SHR_KIND_R8), intent(in) :: Xdst, Ydst
+    real(SHR_KIND_R8), intent(in) :: Xsrc(:, :), Ysrc(:, :)
+    integer(SHR_KIND_IN), intent(out):: pti(:), ptj(:)
+    real(SHR_KIND_R8), intent(out):: ptw(:)
+    integer(SHR_KIND_IN), intent(out):: pnum
 
-  !--- local ---
-  integer(SHR_KIND_IN) :: isize,jsize   ! array sizes
-  integer(SHR_KIND_IN) :: i,j           ! indices
-  integer(SHR_KIND_IN) :: n             ! do loop counter
-  integer(SHR_KIND_IN) :: il,ir         ! index of i left/mid/right
-  integer(SHR_KIND_IN) :: jl,ju         ! index of j lower/mid/upper
-  integer(SHR_KIND_IN) :: pmax          ! size of pti,ptj,ptw
-  real(SHR_KIND_R8)    :: xsl,xsr       ! value of Xsrc, left/right
-  real(SHR_KIND_R8)    :: ysl,ysu       ! value of Ysrc, left/right
-  real(SHR_KIND_R8)    :: xd,yd         ! value of Xdst,Ydst
-  real(SHR_KIND_R8)    :: dx,dy,dx1,dy1 ! some d_lengths for weights calc
-  real(SHR_KIND_R8)    :: csize         ! circle angle/radians
-  real(SHR_KIND_R8)    :: rmin,rmax     ! min/max
-  integer(SHR_KIND_IN) :: pole          ! 0=no, 1=north, 2=south
+    !--- local ---
+    integer(SHR_KIND_IN) :: isize, jsize   ! array sizes
+    integer(SHR_KIND_IN) :: i, j           ! indices
+    integer(SHR_KIND_IN) :: n             ! do loop counter
+    integer(SHR_KIND_IN) :: il, ir         ! index of i left/mid/right
+    integer(SHR_KIND_IN) :: jl, ju         ! index of j lower/mid/upper
+    integer(SHR_KIND_IN) :: pmax          ! size of pti,ptj,ptw
+    real(SHR_KIND_R8)    :: xsl, xsr       ! value of Xsrc, left/right
+    real(SHR_KIND_R8)    :: ysl, ysu       ! value of Ysrc, left/right
+    real(SHR_KIND_R8)    :: xd, yd         ! value of Xdst,Ydst
+    real(SHR_KIND_R8)    :: dx, dy, dx1, dy1 ! some d_lengths for weights calc
+    real(SHR_KIND_R8)    :: csize         ! circle angle/radians
+    real(SHR_KIND_R8)    :: rmin, rmax     ! min/max
+    integer(SHR_KIND_IN) :: pole          ! 0=no, 1=north, 2=south
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_getWts') "
-  character(*),parameter :: F00     = "('(shr_map_getWts) ',a) "
-  character(*),parameter :: F02     = "('(shr_map_getWts) ',a,4g20.13) "
-  character(*),parameter :: F03     = "('(shr_map_getWts) ',a,2g20.13) "
-  character(*),parameter :: F04     = "('(shr_map_getWts) ',a,4i8) "
-  character(*),parameter :: F05     = "('(shr_map_getWts) ',a,3g20.13) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_getWts') "
+    character(*), parameter :: F00 = "('(shr_map_getWts) ',a) "
+    character(*), parameter :: F02 = "('(shr_map_getWts) ',a,4g20.13) "
+    character(*), parameter :: F03 = "('(shr_map_getWts) ',a,2g20.13) "
+    character(*), parameter :: F04 = "('(shr_map_getWts) ',a,4i8) "
+    character(*), parameter :: F05 = "('(shr_map_getWts) ',a,3g20.13) "
 
 !-------------------------------------------------------------------------------
 
-  pmax = size(pti,1)
+    pmax = size(pti, 1)
 
-  !--- is lat/lon degrees or radians?  needed for X wraparound ---
-  csize = 360._SHR_KIND_R8
-  if (shr_map_checkRad(Ysrc)) csize = c2*pi
+    !--- is lat/lon degrees or radians?  needed for X wraparound ---
+    csize = 360._SHR_KIND_R8
+    if (shr_map_checkRad(Ysrc)) csize = c2*pi
 
-  isize = size(Xsrc,1)
-  jsize = size(Xsrc,2)
-  pti = 0
-  ptj = 0
-  ptw = c0
+    isize = size(Xsrc, 1)
+    jsize = size(Xsrc, 2)
+    pti = 0
+    ptj = 0
+    ptw = c0
 
-  xd = Xdst
-  yd = Ydst
+    xd = Xdst
+    yd = Ydst
 
-  call shr_map_find4corners(Xdst,Ydst,Xsrc,Ysrc,il,ir,jl,ju)
+    call shr_map_find4corners(Xdst, Ydst, Xsrc, Ysrc, il, ir, jl, ju)
 
-  !--- bilinear ---
-  pnum = 4
-  pole = 0
-  xsl = Xsrc(il,1)
-  xsr = Xsrc(ir,1)
-  ysl = Ysrc(1,jl)
-  ysu = Ysrc(1,ju)
+    !--- bilinear ---
+    pnum = 4
+    pole = 0
+    xsl = Xsrc(il, 1)
+    xsr = Xsrc(ir, 1)
+    ysl = Ysrc(1, jl)
+    ysu = Ysrc(1, ju)
 
-  if (Xdst < Xsrc(1,1) .or. Xdst > Xsrc(isize,1)) then
-    xsl = mod(Xsrc(il,1),csize)
-    xsr = mod(Xsrc(ir,1),csize)
-    xd  = mod(Xdst       ,csize)
-    if (xsl > xd) xsl = xsl - csize
-    if (xsr < xd) xsr = xsr + csize
-  endif
+    if (Xdst < Xsrc(1, 1) .or. Xdst > Xsrc(isize, 1)) then
+      xsl = mod(Xsrc(il, 1), csize)
+      xsr = mod(Xsrc(ir, 1), csize)
+      xd = mod(Xdst, csize)
+      if (xsl > xd) xsl = xsl - csize
+      if (xsr < xd) xsr = xsr + csize
+    end if
 
-  if (Ydst > Ysrc(1,jsize)) then
-    if (dopole) then
-      pnum = isize+2
-      pole = 1
-    endif
-    ysu =  csize/(c2*c2)
-  elseif (Ydst < Ysrc(1,1)) then
-    if (dopole) then
-      pnum = isize+2
-      pole = 2
-    endif
-    ysl = -csize/(c2*c2)
-  endif
+    if (Ydst > Ysrc(1, jsize)) then
+      if (dopole) then
+        pnum = isize + 2
+        pole = 1
+      end if
+      ysu = csize/(c2*c2)
+    elseif (Ydst < Ysrc(1, 1)) then
+      if (dopole) then
+        pnum = isize + 2
+        pole = 2
+      end if
+      ysl = -csize/(c2*c2)
+    end if
 
-  !--- compute dx1,dy1; distance from src(1) to dst
-  dx  = (xsr-xsl)
-  dy  = (ysu-ysl)
-  dx1 = ( xd-xsl)
-  dy1 = ( yd-Ysl)
+    !--- compute dx1,dy1; distance from src(1) to dst
+    dx = (xsr - xsl)
+    dy = (ysu - ysl)
+    dx1 = (xd - xsl)
+    dy1 = (yd - Ysl)
 
-  if (dx <= c0 .or. dy <= c0 .or. dx1 > dx .or. dy1 > dy) then
-    write(6,*) ' '
-    write(6,F02) 'ERROR in dx,dy: ',dx1,dx,dy1,dy
-    write(6,F03) '   dst: ',Xdst,Ydst
-    write(6,F04) '   ind: ',il,ir,jl,ju
-    write(6,F02) '   dis: ',dx1,dx,dy1,dy
-    write(6,F05) '   x3 : ',xsl,xd,xsr
-    write(6,F05) '   y3 : ',ysl,yd,ysu
-    write(6,*) ' '
-    call shr_map_abort(subName//' ERROR in dx,dy calc')
-    stop
-    return
-  endif
+    if (dx <= c0 .or. dy <= c0 .or. dx1 > dx .or. dy1 > dy) then
+      write (6, *) ' '
+      write (6, F02) 'ERROR in dx,dy: ', dx1, dx, dy1, dy
+      write (6, F03) '   dst: ', Xdst, Ydst
+      write (6, F04) '   ind: ', il, ir, jl, ju
+      write (6, F02) '   dis: ', dx1, dx, dy1, dy
+      write (6, F05) '   x3 : ', xsl, xd, xsr
+      write (6, F05) '   y3 : ', ysl, yd, ysu
+      write (6, *) ' '
+      call shr_map_abort(subName//' ERROR in dx,dy calc')
+      stop
+      return
+    end if
 
-  dx1 = dx1 / dx
-  dy1 = dy1 / dy
+    dx1 = dx1/dx
+    dy1 = dy1/dy
 
-  if (pnum > pmax) then
-    call shr_sys_abort(subName//' ERROR pti not big enough')
-  endif
+    if (pnum > pmax) then
+      call shr_sys_abort(subName//' ERROR pti not big enough')
+    end if
 
-  if (pole == 0) then       ! bilinear
+    if (pole == 0) then       ! bilinear
 
-    pti(1) = il
-    pti(2) = ir
-    pti(3) = il
-    pti(4) = ir
+      pti(1) = il
+      pti(2) = ir
+      pti(3) = il
+      pti(4) = ir
 
-    ptj(1) = jl
-    ptj(2) = jl
-    ptj(3) = ju
-    ptj(4) = ju
+      ptj(1) = jl
+      ptj(2) = jl
+      ptj(3) = ju
+      ptj(4) = ju
 
-    ptw(1) = (c1-dx1)*(c1-dy1)
-    ptw(2) = (   dx1)*(c1-dy1)
-    ptw(3) = (c1-dx1)*(   dy1)
-    ptw(4) = (   dx1)*(   dy1)
+      ptw(1) = (c1 - dx1)*(c1 - dy1)
+      ptw(2) = (dx1)*(c1 - dy1)
+      ptw(3) = (c1 - dx1)*(dy1)
+      ptw(4) = (dx1)*(dy1)
 
-  elseif (pole == 1) then   ! north pole
+    elseif (pole == 1) then   ! north pole
 
-    pti(1) = il
-    pti(2) = ir
+      pti(1) = il
+      pti(2) = ir
 
-    ptj(1) = jl
-    ptj(2) = jl
+      ptj(1) = jl
+      ptj(2) = jl
 
-    ptw(1) = (c1-dx1)*(c1-dy1)
-    ptw(2) = (   dx1)*(c1-dy1)
+      ptw(1) = (c1 - dx1)*(c1 - dy1)
+      ptw(2) = (dx1)*(c1 - dy1)
 
-    do n=1,isize
-      pti(2+n) = n
-      ptj(2+n) = ju
-      ptw(2+n) = (dy1)/real(isize,SHR_KIND_R8)
-    enddo
+      do n = 1, isize
+        pti(2 + n) = n
+        ptj(2 + n) = ju
+        ptw(2 + n) = (dy1)/real(isize, SHR_KIND_R8)
+      end do
 
-  elseif (pole == 2) then   ! south pole
+    elseif (pole == 2) then   ! south pole
 
-    pti(1) = il
-    pti(2) = ir
+      pti(1) = il
+      pti(2) = ir
 
-    ptj(1) = ju
-    ptj(2) = ju
+      ptj(1) = ju
+      ptj(2) = ju
 
-    ptw(1) = (c1-dx1)*(   dy1)
-    ptw(2) = (   dx1)*(   dy1)
+      ptw(1) = (c1 - dx1)*(dy1)
+      ptw(2) = (dx1)*(dy1)
 
-    do n=1,isize
-      pti(2+n) = n
-      ptj(2+n) = jl
-      ptw(2+n) = (c1-dy1)/real(isize,SHR_KIND_R8)
-    enddo
+      do n = 1, isize
+        pti(2 + n) = n
+        ptj(2 + n) = jl
+        ptw(2 + n) = (c1 - dy1)/real(isize, SHR_KIND_R8)
+      end do
 
-  else
+    else
 
-    write(6,F00) ' ERROR illegal pnum situation '
-    call shr_map_abort(subName//' ERROR illegal pnum situation')
+      write (6, F00) ' ERROR illegal pnum situation '
+      call shr_map_abort(subName//' ERROR illegal pnum situation')
 
-  endif
+    end if
 
-end subroutine shr_map_getWts
+  end subroutine shr_map_getWts
 
 !===============================================================================
 
-subroutine shr_map_find4corners(Xdst,Ydst,Xsrc,Ysrc,il,ir,jl,ju)
+  subroutine shr_map_find4corners(Xdst, Ydst, Xsrc, Ysrc, il, ir, jl, ju)
 
 ! finds 4 corner points surrounding dst in src
 ! returns left, right, lower, and upper i and j index
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  real(SHR_KIND_R8)   ,intent(in) :: Xdst,Ydst
-  real(SHR_KIND_R8)   ,intent(in) :: Xsrc(:,:),Ysrc(:,:)
-  integer(SHR_KIND_IN),intent(out):: il,ir,jl,ju
+    real(SHR_KIND_R8), intent(in) :: Xdst, Ydst
+    real(SHR_KIND_R8), intent(in) :: Xsrc(:, :), Ysrc(:, :)
+    integer(SHR_KIND_IN), intent(out):: il, ir, jl, ju
 
-  !--- local ---
-  integer(SHR_KIND_IN) :: isize,jsize
-  integer(SHR_KIND_IN) :: im,jm
+    !--- local ---
+    integer(SHR_KIND_IN) :: isize, jsize
+    integer(SHR_KIND_IN) :: im, jm
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_find4corners') "
-  character(*),parameter :: F00     = "('(shr_map_find4corners) ',a,2i8) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_find4corners') "
+    character(*), parameter :: F00 = "('(shr_map_find4corners) ',a,2i8) "
 
 !-------------------------------------------------------------------------------
 
-  isize = size(Xsrc,1)
-  jsize = size(Xsrc,2)
+    isize = size(Xsrc, 1)
+    jsize = size(Xsrc, 2)
 
-  if (Xdst < Xsrc(1,1) .or. Xdst > Xsrc(isize,1)) then
-    il = isize
-    ir = 1
-  else
-    !--- find i index where Xsrc(i) <=  Xdst < Xsrc(i+1) ---
-    il = 1
-    ir = isize
-    do while (ir-il > 1)
-      im = (ir+il)/2
-      if (Xdst >= Xsrc(im,1)) then
-        il = im
-      else
-        ir = im
-      endif
-    enddo
-  endif
+    if (Xdst < Xsrc(1, 1) .or. Xdst > Xsrc(isize, 1)) then
+      il = isize
+      ir = 1
+    else
+      !--- find i index where Xsrc(i) <=  Xdst < Xsrc(i+1) ---
+      il = 1
+      ir = isize
+      do while (ir - il > 1)
+        im = (ir + il)/2
+        if (Xdst >= Xsrc(im, 1)) then
+          il = im
+        else
+          ir = im
+        end if
+      end do
+    end if
 
-  if (Ydst > Ysrc(1,jsize)) then
-    jl = jsize
-    ju = jsize
-  elseif (Ydst < Ysrc(1,1)) then
-    jl = 1
-    ju = 1
-  else
-    !--- find j index where Ysrc(j) <=  Ydst < Ysrc(j+1) ---
-    jl = 1
-    ju = jsize
-    do while (ju-jl > 1)
-      jm = (ju+jl)/2
-      if (Ydst >= Ysrc(1,jm)) then
-        jl = jm
-      else
-        ju = jm
-      endif
-    enddo
-  endif
+    if (Ydst > Ysrc(1, jsize)) then
+      jl = jsize
+      ju = jsize
+    elseif (Ydst < Ysrc(1, 1)) then
+      jl = 1
+      ju = 1
+    else
+      !--- find j index where Ysrc(j) <=  Ydst < Ysrc(j+1) ---
+      jl = 1
+      ju = jsize
+      do while (ju - jl > 1)
+        jm = (ju + jl)/2
+        if (Ydst >= Ysrc(1, jm)) then
+          jl = jm
+        else
+          ju = jm
+        end if
+      end do
+    end if
 
-end subroutine shr_map_find4corners
+  end subroutine shr_map_find4corners
 
 !===============================================================================
 
-subroutine shr_map_findnn(Xdst,Ydst,Xsrc,Ysrc,Msrc,inn,jnn)
+  subroutine shr_map_findnn(Xdst, Ydst, Xsrc, Ysrc, Msrc, inn, jnn)
 
 ! finds point in src nearest to dst, returns inn,jnn src index
 ! searches using Msrc active points only
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  real(SHR_KIND_R8)   ,intent(in) :: Xdst,Ydst
-  real(SHR_KIND_R8)   ,intent(in) :: Xsrc(:,:),Ysrc(:,:)
-  integer(SHR_KIND_IN),intent(in) :: Msrc(:,:)
-  integer(SHR_KIND_IN),intent(out):: inn,jnn
+    real(SHR_KIND_R8), intent(in) :: Xdst, Ydst
+    real(SHR_KIND_R8), intent(in) :: Xsrc(:, :), Ysrc(:, :)
+    integer(SHR_KIND_IN), intent(in) :: Msrc(:, :)
+    integer(SHR_KIND_IN), intent(out):: inn, jnn
 
-  !--- local ---
-  integer(SHR_KIND_IN) :: isize,jsize
-  integer(SHR_KIND_IN) :: i,j
-  real(SHR_KIND_R8)    :: dnn,dist
+    !--- local ---
+    integer(SHR_KIND_IN) :: isize, jsize
+    integer(SHR_KIND_IN) :: i, j
+    real(SHR_KIND_R8)    :: dnn, dist
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_findnn') "
-  character(*),parameter :: F00     = "('(shr_map_findnn) ',a,2i8) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_findnn') "
+    character(*), parameter :: F00 = "('(shr_map_findnn) ',a,2i8) "
 
 !-------------------------------------------------------------------------------
 
-  isize = size(Xsrc,1)
-  jsize = size(Xsrc,2)
+    isize = size(Xsrc, 1)
+    jsize = size(Xsrc, 2)
 
-  inn = -1
-  jnn = -1
-  dnn = -1._SHR_KIND_R8
-  do j=1,jsize
-  do i=1,isize
-    if (Msrc(i,j) /= 0) then
-      dist = shr_map_finddist(Xdst,Ydst,Xsrc(i,j),Ysrc(i,j))
-      if (dist < dnn .or. inn < 0) then
-        dnn = dist
-        inn = i
-        jnn = j
-      endif
-    endif
-  enddo
-  enddo
+    inn = -1
+    jnn = -1
+    dnn = -1._SHR_KIND_R8
+    do j = 1, jsize
+    do i = 1, isize
+      if (Msrc(i, j) /= 0) then
+        dist = shr_map_finddist(Xdst, Ydst, Xsrc(i, j), Ysrc(i, j))
+        if (dist < dnn .or. inn < 0) then
+          dnn = dist
+          inn = i
+          jnn = j
+        end if
+      end if
+    end do
+    end do
 
-end subroutine shr_map_findnn
+  end subroutine shr_map_findnn
 
 !===============================================================================
 
-subroutine shr_map_findnnon(dir,Xdst,Ydst,Xsrc,Ysrc,Msrc,inn,jnn)
+  subroutine shr_map_findnnon(dir, Xdst, Ydst, Xsrc, Ysrc, Msrc, inn, jnn)
 
 ! finds point in src nearest to dst searching i dir first
 ! returns inn,jnn src index
 ! searches using Msrc active points only
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  character(*)        ,intent(in) :: dir
-  real(SHR_KIND_R8)   ,intent(in) :: Xdst,Ydst
-  real(SHR_KIND_R8)   ,intent(in) :: Xsrc(:,:),Ysrc(:,:)
-  integer(SHR_KIND_IN),intent(in) :: Msrc(:,:)
-  integer(SHR_KIND_IN),intent(out):: inn,jnn
+    character(*), intent(in) :: dir
+    real(SHR_KIND_R8), intent(in) :: Xdst, Ydst
+    real(SHR_KIND_R8), intent(in) :: Xsrc(:, :), Ysrc(:, :)
+    integer(SHR_KIND_IN), intent(in) :: Msrc(:, :)
+    integer(SHR_KIND_IN), intent(out):: inn, jnn
 
-  !--- local ---
-  integer(SHR_KIND_IN) :: isize,jsize
-  integer(SHR_KIND_IN) :: il,ir,jl,ju
-  integer(SHR_KIND_IN) :: n,i,j
-  integer(SHR_KIND_IN) :: is,js
-  integer(SHR_KIND_IN) :: i2,j2
-  real(SHR_KIND_R8)    :: dnn,dist,ds
+    !--- local ---
+    integer(SHR_KIND_IN) :: isize, jsize
+    integer(SHR_KIND_IN) :: il, ir, jl, ju
+    integer(SHR_KIND_IN) :: n, i, j
+    integer(SHR_KIND_IN) :: is, js
+    integer(SHR_KIND_IN) :: i2, j2
+    real(SHR_KIND_R8)    :: dnn, dist, ds
 
-  !--- formats ---
-  character(*),parameter :: subName = "('shr_map_findnnon') "
-  character(*),parameter :: F00     = "('(shr_map_findnnon) ',a,2i8) "
+    !--- formats ---
+    character(*), parameter :: subName = "('shr_map_findnnon') "
+    character(*), parameter :: F00 = "('(shr_map_findnnon) ',a,2i8) "
 
 !-------------------------------------------------------------------------------
 
-  isize = size(Xsrc,1)
-  jsize = size(Xsrc,2)
+    isize = size(Xsrc, 1)
+    jsize = size(Xsrc, 2)
 
-  !--- find 4 corner points
-  call shr_map_find4corners(Xdst,Ydst,Xsrc,Ysrc,il,ir,jl,ju)
+    !--- find 4 corner points
+    call shr_map_find4corners(Xdst, Ydst, Xsrc, Ysrc, il, ir, jl, ju)
 
-  !--- find closest of 4 corner points to dst, set that to is,js
-  is = il
-  js = jl
-  ds = shr_map_finddist(Xdst,Ydst,Xsrc(il,jl),Ysrc(il,jl))
-  dist = shr_map_finddist(Xdst,Ydst,Xsrc(ir,jl),Ysrc(ir,jl))
-  if (dist < ds) then
-    is = ir
-    js = jl
-    ds = dist
-  endif
-  dist = shr_map_finddist(Xdst,Ydst,Xsrc(il,ju),Ysrc(il,ju))
-  if (dist < ds) then
+    !--- find closest of 4 corner points to dst, set that to is,js
     is = il
-    js = ju
-    ds = dist
-  endif
-  dist = shr_map_finddist(Xdst,Ydst,Xsrc(ir,ju),Ysrc(ir,ju))
-  if (dist < ds) then
-    is = ir
-    js = ju
-    ds = dist
-  endif
+    js = jl
+    ds = shr_map_finddist(Xdst, Ydst, Xsrc(il, jl), Ysrc(il, jl))
+    dist = shr_map_finddist(Xdst, Ydst, Xsrc(ir, jl), Ysrc(ir, jl))
+    if (dist < ds) then
+      is = ir
+      js = jl
+      ds = dist
+    end if
+    dist = shr_map_finddist(Xdst, Ydst, Xsrc(il, ju), Ysrc(il, ju))
+    if (dist < ds) then
+      is = il
+      js = ju
+      ds = dist
+    end if
+    dist = shr_map_finddist(Xdst, Ydst, Xsrc(ir, ju), Ysrc(ir, ju))
+    if (dist < ds) then
+      is = ir
+      js = ju
+      ds = dist
+    end if
 
-  inn = -1
-  jnn = -1
-  dnn = -1._SHR_KIND_R8
-  i2 = 0
-  j2 = 0
+    inn = -1
+    jnn = -1
+    dnn = -1._SHR_KIND_R8
+    i2 = 0
+    j2 = 0
 
-  if (trim(dir) == 'i') then
-    !--- search biased over i ---
-    do while (inn < 0 .and. j2 < jsize)
-    do n=1,2
-      if (n == 1) j = min(js + j2,jsize)
-      if (n == 2) j = max(js - j2,1)
-      do i=1,isize
-        if (Msrc(i,j) /= 0) then
-          dist = shr_map_finddist(Xdst,Ydst,Xsrc(i,j),Ysrc(i,j))
-          if (dist < dnn .or. inn < 0) then
-            dnn = dist
-            inn = i
-            jnn = j
-          endif
-        endif
-      enddo
-    enddo
-    j2 = j2 + 1
-    enddo
-  elseif (trim(dir) == 'j') then
-    !--- search biased over j ---
-    do while (inn < 0 .and. i2 < isize)
-    do n=1,2
-      if (n == 1) i = min(is + i2,isize)
-      if (n == 2) i = max(is - i2,1)
-      do j=1,jsize
-        if (Msrc(i,j) /= 0) then
-          dist = shr_map_finddist(Xdst,Ydst,Xsrc(i,j),Ysrc(i,j))
-          if (dist < dnn .or. inn < 0) then
-            dnn = dist
-            inn = i
-            jnn = j
-          endif
-        endif
-      enddo
-    enddo
-    i2 = i2 + 1
-    enddo
-  else
-    call shr_map_abort(subName//' ERROR illegal dir '//trim(dir))
-  endif
+    if (trim(dir) == 'i') then
+      !--- search biased over i ---
+      do while (inn < 0 .and. j2 < jsize)
+      do n = 1, 2
+        if (n == 1) j = min(js + j2, jsize)
+        if (n == 2) j = max(js - j2, 1)
+        do i = 1, isize
+          if (Msrc(i, j) /= 0) then
+            dist = shr_map_finddist(Xdst, Ydst, Xsrc(i, j), Ysrc(i, j))
+            if (dist < dnn .or. inn < 0) then
+              dnn = dist
+              inn = i
+              jnn = j
+            end if
+          end if
+        end do
+      end do
+      j2 = j2 + 1
+      end do
+    elseif (trim(dir) == 'j') then
+      !--- search biased over j ---
+      do while (inn < 0 .and. i2 < isize)
+      do n = 1, 2
+        if (n == 1) i = min(is + i2, isize)
+        if (n == 2) i = max(is - i2, 1)
+        do j = 1, jsize
+          if (Msrc(i, j) /= 0) then
+            dist = shr_map_finddist(Xdst, Ydst, Xsrc(i, j), Ysrc(i, j))
+            if (dist < dnn .or. inn < 0) then
+              dnn = dist
+              inn = i
+              jnn = j
+            end if
+          end if
+        end do
+      end do
+      i2 = i2 + 1
+      end do
+    else
+      call shr_map_abort(subName//' ERROR illegal dir '//trim(dir))
+    end if
 
-end subroutine shr_map_findnnon
+  end subroutine shr_map_findnnon
 
 !===============================================================================
 
-real(SHR_KIND_R8) function shr_map_finddist(Xdst,Ydst,Xsrc,Ysrc)
+  real(SHR_KIND_R8) function shr_map_finddist(Xdst, Ydst, Xsrc, Ysrc)
 
 ! x,y distance computation
 
-  implicit none
-  real(SHR_KIND_R8),intent(in) :: Xdst,Ydst,Xsrc,Ysrc
-  character(*),parameter :: subName = "('shr_map_finddist') "
+    implicit none
+    real(SHR_KIND_R8), intent(in) :: Xdst, Ydst, Xsrc, Ysrc
+    character(*), parameter :: subName = "('shr_map_finddist') "
 
 !-------------------------------------------------------------------------------
 
-  shr_map_finddist = sqrt((Ydst-Ysrc)**2 + (Xdst-Xsrc)**2)
+    shr_map_finddist = sqrt((Ydst - Ysrc)**2 + (Xdst - Xsrc)**2)
 
-end function shr_map_finddist
+  end function shr_map_finddist
 
 !===============================================================================
 
-logical function shr_map_checkRad(Grid)
+  logical function shr_map_checkRad(Grid)
 
 ! check if grid is rad or degree
 
-  implicit none
-  real(SHR_KIND_R8),intent(in) :: Grid(:,:)
-  character(*),parameter :: subName = "('shr_map_checkRad') "
-  real(SHR_KIND_R8) :: rmin,rmax
+    implicit none
+    real(SHR_KIND_R8), intent(in) :: Grid(:, :)
+    character(*), parameter :: subName = "('shr_map_checkRad') "
+    real(SHR_KIND_R8) :: rmin, rmax
 
 !-------------------------------------------------------------------------------
 
-  shr_map_checkRad = .false.
-  rmin = minval(Grid)
-  rmax = maxval(Grid)
-  if ((rmax - rmin) < 1.01_SHR_KIND_R8*c2*pi) shr_map_checkRad = .true.
+    shr_map_checkRad = .false.
+    rmin = minval(Grid)
+    rmax = maxval(Grid)
+    if ((rmax - rmin) < 1.01_SHR_KIND_R8*c2*pi) shr_map_checkRad = .true.
 
-end function shr_map_checkRad
+  end function shr_map_checkRad
 
 !===============================================================================
 
-subroutine shr_map_1dto2d(gid,ni,nj,i,j)
+  subroutine shr_map_1dto2d(gid, ni, nj, i, j)
 
 ! convert from a 1d index system to a 2d index system
 ! gid is 1d index; ni,nj are 2d grid size; i,j are local 2d index
 
-  implicit none
-  integer(SHR_KIND_IN),intent(in) :: gid,ni,nj
-  integer(SHR_KIND_IN),intent(out):: i,j
-  character(*),parameter :: subName = "('shr_map_1dto2d') "
-  character(*),parameter :: F01     = "('(shr_map_1dto2d) ',a,3i8)" 
+    implicit none
+    integer(SHR_KIND_IN), intent(in) :: gid, ni, nj
+    integer(SHR_KIND_IN), intent(out):: i, j
+    character(*), parameter :: subName = "('shr_map_1dto2d') "
+    character(*), parameter :: F01 = "('(shr_map_1dto2d) ',a,3i8)"
 
 !-------------------------------------------------------------------------------
 
-  if (gid < 1 .or. gid > ni*nj) then
-    write(6,F01) 'ERROR: illegal gid ',gid,ni,nj
-    call shr_map_abort(subName//' ERROR')
-  endif
-  j = (gid-1)/ni+1
-  i = mod(gid-1,ni)+1
+    if (gid < 1 .or. gid > ni*nj) then
+      write (6, F01) 'ERROR: illegal gid ', gid, ni, nj
+      call shr_map_abort(subName//' ERROR')
+    end if
+    j = (gid - 1)/ni + 1
+    i = mod(gid - 1, ni) + 1
 
-end subroutine shr_map_1dto2d
+  end subroutine shr_map_1dto2d
 
 !===============================================================================
 
-subroutine shr_map_2dto1d(gid,ni,nj,i,j)
+  subroutine shr_map_2dto1d(gid, ni, nj, i, j)
 
 ! convert from a 2d index system to a 1d index system
 ! gid is 1d index; ni,nj are 2d grid size; i,j are local 2d index
 
-  implicit none
-  integer(SHR_KIND_IN),intent(in) :: ni,nj,i,j
-  integer(SHR_KIND_IN),intent(out):: gid
-  character(*),parameter :: subName = "('shr_map_2dto1d') "
-  character(*),parameter :: F01     = "('(shr_map_2dto1d) ',a,4i8)" 
+    implicit none
+    integer(SHR_KIND_IN), intent(in) :: ni, nj, i, j
+    integer(SHR_KIND_IN), intent(out):: gid
+    character(*), parameter :: subName = "('shr_map_2dto1d') "
+    character(*), parameter :: F01 = "('(shr_map_2dto1d) ',a,4i8)"
 
 !-------------------------------------------------------------------------------
 
-  if (i < 1 .or. i > ni .or. j < 1 .or. j > nj) then
-    write(6,F01) 'ERROR: illegal i,j ',i,ni,j,nj
-    call shr_map_abort(subName//' ERROR')
-  endif
-  gid = (j-1)*ni + i
+    if (i < 1 .or. i > ni .or. j < 1 .or. j > nj) then
+      write (6, F01) 'ERROR: illegal i,j ', i, ni, j, nj
+      call shr_map_abort(subName//' ERROR')
+    end if
+    gid = (j - 1)*ni + i
 
-end subroutine shr_map_2dto1d
+  end subroutine shr_map_2dto1d
 
 !===============================================================================
 !===============================================================================
 end module shr_map_mod
-  
+

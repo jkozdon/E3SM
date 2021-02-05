@@ -9,7 +9,7 @@
 !
 ! !DESCRIPTION:
 !
-! Miscilaneous methods to handle file and directory utilities needed for 
+! Miscilaneous methods to handle file and directory utilities needed for
 ! message passing CCSM.
 !
 ! NOTE:
@@ -26,25 +26,25 @@
 MODULE shr_msg_mod
 
 ! ! USES:
-   use shr_file_mod   ! The real guts of everything here
+  use shr_file_mod   ! The real guts of everything here
 
-   IMPLICIT none
-   PRIVATE           ! By default everything is private to this module
+  IMPLICIT none
+  PRIVATE           ! By default everything is private to this module
 
-! !PUBLIC TYPES:               
+! !PUBLIC TYPES:
 
-   ! no public types
+  ! no public types
 
 ! !PUBLIC MEMBER FUNCTIONS:
-   public :: shr_msg_chDir    ! change current working directory
-   public :: shr_msg_chStdIn  ! change stdin  (attach to a file)
-   public :: shr_msg_chStdOut ! change stdout (attach to a file)
-   public :: shr_msg_stdio    ! change dir and stdin and stdout
-   public :: shr_msg_dirio    ! change stdin and stdout
+  public :: shr_msg_chDir    ! change current working directory
+  public :: shr_msg_chStdIn  ! change stdin  (attach to a file)
+  public :: shr_msg_chStdOut ! change stdout (attach to a file)
+  public :: shr_msg_stdio    ! change dir and stdin and stdout
+  public :: shr_msg_dirio    ! change stdin and stdout
 
 ! !PUBLIC DATA MEMBERS:
 
-   ! no public data members
+  ! no public data members
 
 !EOP
 
@@ -57,18 +57,18 @@ CONTAINS
 ! !IROUTINE: shr_msg_stdio -- Change working directory, and redirect stdin/stdout
 !
 ! !DESCRIPTION:
-!   1) change the cwd (current working directory) and 
+!   1) change the cwd (current working directory) and
 !   2) redirect stdin & stdout (units 5 & 6) to named files,
 !   where the desired cwd & files are specified by namelist file.
 !
-! !INTERFACE: ------------------------------------------------------------------  
-SUBROUTINE shr_msg_stdio(model)
+! !INTERFACE: ------------------------------------------------------------------
+  SUBROUTINE shr_msg_stdio(model)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
-   !--- arguments ---
-   character(len=*),intent(in) :: model ! used to construct env varible name
+    !--- arguments ---
+    character(len=*), intent(in) :: model ! used to construct env varible name
 !EOP
 
 !-------------------------------------------------------------------------------
@@ -76,9 +76,9 @@ SUBROUTINE shr_msg_stdio(model)
 !
 !-------------------------------------------------------------------------------
 
-     call shr_file_stdio(model)
- 
-END SUBROUTINE shr_msg_stdio
+    call shr_file_stdio(model)
+
+  END SUBROUTINE shr_msg_stdio
 
 !===============================================================================
 
@@ -89,30 +89,30 @@ END SUBROUTINE shr_msg_stdio
 ! !DESCRIPTION:
 !   change the cwd (current working directory), see shr_msg_stdio for notes
 !
-! !INTERFACE: ------------------------------------------------------------------  
+! !INTERFACE: ------------------------------------------------------------------
 
-SUBROUTINE shr_msg_chdir(model)
+  SUBROUTINE shr_msg_chdir(model)
 
 ! !USES:
-   use shr_sys_mod, only: shr_sys_chdir
+    use shr_sys_mod, only: shr_sys_chdir
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
-   !--- arguments ---
-   character(len=*),intent(in) :: model ! used to construct env varible name
+    !--- arguments ---
+    character(len=*), intent(in) :: model ! used to construct env varible name
 !EOP
 
-   !--- local ---
+    !--- local ---
 
 !-------------------------------------------------------------------------------
 ! Notes:
 !
 !-------------------------------------------------------------------------------
 
-   call shr_file_chdir( model )
- 
-END SUBROUTINE shr_msg_chdir
+    call shr_file_chdir(model)
+
+  END SUBROUTINE shr_msg_chdir
 
 !===============================================================================
 
@@ -123,26 +123,26 @@ END SUBROUTINE shr_msg_chdir
 ! !DESCRIPTION:
 !   change the stdin & stdout (units 5 & 6), see shr_msg_stdio for notes
 !
-! !INTERFACE: ------------------------------------------------------------------  
-SUBROUTINE shr_msg_dirio(model)
+! !INTERFACE: ------------------------------------------------------------------
+  SUBROUTINE shr_msg_dirio(model)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
-   !--- arguments ---
-   character(len=*),intent(in) :: model ! used to construct env varible name
+    !--- arguments ---
+    character(len=*), intent(in) :: model ! used to construct env varible name
 !EOP
 
-   !--- local ---
+    !--- local ---
 
 !-------------------------------------------------------------------------------
 ! Notes:
 !
 !-------------------------------------------------------------------------------
 
-   call shr_file_dirio(model)
- 
-END SUBROUTINE shr_msg_dirio
+    call shr_file_dirio(model)
+
+  END SUBROUTINE shr_msg_dirio
 
 !===============================================================================
 
@@ -153,16 +153,16 @@ END SUBROUTINE shr_msg_dirio
 ! !DESCRIPTION:
 !   change the stdin (unit 5), see shr_msg_stdio for notes
 !
-! !INTERFACE: ------------------------------------------------------------------  
-SUBROUTINE shr_msg_chStdIn(model)
+! !INTERFACE: ------------------------------------------------------------------
+  SUBROUTINE shr_msg_chStdIn(model)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
-   !--- arguments ---
-   character(*),intent(in) :: model ! used to construct env varible name
+    !--- arguments ---
+    character(*), intent(in) :: model ! used to construct env varible name
 !EOP
-   !--- local ---
+    !--- local ---
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -170,8 +170,8 @@ SUBROUTINE shr_msg_chStdIn(model)
 !-------------------------------------------------------------------------------
 
     call shr_file_chStdIn(model)
- 
-END SUBROUTINE shr_msg_chStdIn
+
+  END SUBROUTINE shr_msg_chStdIn
 
 !===============================================================================
 
@@ -182,18 +182,18 @@ END SUBROUTINE shr_msg_chStdIn
 ! !DESCRIPTION:
 !   change the stdout (unit 6), see shr_msg_stdio for notes
 !
-! !INTERFACE: ------------------------------------------------------------------  
+! !INTERFACE: ------------------------------------------------------------------
 
-SUBROUTINE shr_msg_chStdOut(model)
+  SUBROUTINE shr_msg_chStdOut(model)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
-   !--- arguments ---
-   character(*),intent(in) :: model ! used to construct env varible name
+    !--- arguments ---
+    character(*), intent(in) :: model ! used to construct env varible name
 !EOP
 
-   !--- local ---
+    !--- local ---
 
 !-------------------------------------------------------------------------------
 ! Notes:
@@ -202,7 +202,7 @@ SUBROUTINE shr_msg_chStdOut(model)
 
     call shr_file_chStdOut(model)
 
-END SUBROUTINE shr_msg_chStdOut
+  END SUBROUTINE shr_msg_chStdOut
 
 !===============================================================================
 

@@ -55,14 +55,14 @@
 !
 !    Klemp, J. B., W. C. Skamarock, W. C., and S.-H. Park, 2015:
 !    Idealized Global Nonhydrostatic Atmospheric Test Cases on a Reduced
-!    Radius Sphere. Journal of Advances in Modeling Earth Systems. 
+!    Radius Sphere. Journal of Advances in Modeling Earth Systems.
 !    doi:10.1002/2015MS000435
 !
 !=======================================================================
 
 SUBROUTINE KESSLER(theta, qv, qc, qr, rho, pk, dt, z, nz, precl)
 
-use physical_constants,   only:  kappa
+  use physical_constants, only: kappa
 
   IMPLICIT NONE
 
@@ -71,23 +71,23 @@ use physical_constants,   only:  kappa
   !------------------------------------------------
 
   REAL(8), DIMENSION(nz), INTENT(INOUT) :: &
-            theta   ,     & ! Potential temperature (K)
-            qv      ,     & ! Water vapor mixing ratio (gm/gm)
-            qc      ,     & ! Cloud water mixing ratio (gm/gm)
-            qr              ! Rain  water mixing ratio (gm/gm)
+    theta, & ! Potential temperature (K)
+    qv, & ! Water vapor mixing ratio (gm/gm)
+    qc, & ! Cloud water mixing ratio (gm/gm)
+    qr              ! Rain  water mixing ratio (gm/gm)
 
   REAL(8), DIMENSION(nz), INTENT(IN) :: &
-            rho             ! Dry air density (not mean state as in KW) (kg/m^3)
+    rho             ! Dry air density (not mean state as in KW) (kg/m^3)
 
   REAL(8), INTENT(OUT) :: &
-            precl          ! Precipitation rate (m_water / s)
+    precl          ! Precipitation rate (m_water / s)
 
   REAL(8), DIMENSION(nz), INTENT(IN) :: &
-            z       ,     & ! Heights of thermo. levels in the grid column (m)
-            pk              ! Exner function (p/p0)**(R/cp)
+    z, & ! Heights of thermo. levels in the grid column (m)
+    pk              ! Exner function (p/p0)**(R/cp)
 
-  REAL(8), INTENT(IN) :: & 
-            dt              ! Time step (s)
+  REAL(8), INTENT(IN) :: &
+    dt              ! Time step (s)
 
   INTEGER, INTENT(IN) :: nz ! Number of thermodynamic levels in the column
 
@@ -104,89 +104,89 @@ use physical_constants,   only:  kappa
   !   Begin calculation
   !------------------------------------------------
   f2x = 17.27d0
-  f5 = 237.3d0 * f2x * 2500000.d0 / 1003.d0
+  f5 = 237.3d0*f2x*2500000.d0/1003.d0
   xk = .2875d0      !  kappa (r/cp)
   !xk = kappa      !  kappa (r/cp)
 
-  psl    = 1000.d0  !  pressure at sea level (mb)
-  rhoqr  = 1000.d0  !  density of liquid water (kg/m^3)
+  psl = 1000.d0  !  pressure at sea level (mb)
+  rhoqr = 1000.d0  !  density of liquid water (kg/m^3)
 
-  do k=1,nz
-    r(k)     = 0.001d0*rho(k)
+  do k = 1, nz
+    r(k) = 0.001d0*rho(k)
     rhalf(k) = sqrt(rho(1)/rho(k))
-    pc(k)    = 3.8d0/(pk(k)**(1./xk)*psl)
+    pc(k) = 3.8d0/(pk(k)**(1./xk)*psl)
 
     ! Liquid water terminal velocity (m/s) following KW eq. 2.15
-    velqr(k)  = 36.34d0*(qr(k)*r(k))**0.1364*rhalf(k)
+    velqr(k) = 36.34d0*(qr(k)*r(k))**0.1364*rhalf(k)
 
   end do
 
   ! Maximum time step size in accordance with CFL condition
   if (dt .le. 0.d0) then
-    write(*,*) 'kessler.f90 called with nonpositive dt'
+    write (*, *) 'kessler.f90 called with nonpositive dt'
     stop
   end if
 
   dt_max = dt
-  do k=1,nz-1
+  do k = 1, nz - 1
     if (velqr(k) .ne. 0.d0) then
-      dt_max = min(dt_max, 0.8d0*(z(k+1)-z(k))/velqr(k))
+      dt_max = min(dt_max, 0.8d0*(z(k + 1) - z(k))/velqr(k))
     end if
   end do
 
   ! Number of subcycles
-  rainsplit = ceiling(dt / dt_max)
-  dt0 = dt / real(rainsplit,8)
+  rainsplit = ceiling(dt/dt_max)
+  dt0 = dt/real(rainsplit, 8)
 
   ! Subcycle through rain process
   precl = 0.d0
 
-  do nt=1,rainsplit
+  do nt = 1, rainsplit
 
     ! Precipitation rate (m/s)
-    precl = precl + rho(1) * qr(1) * velqr(1) / rhoqr
+    precl = precl + rho(1)*qr(1)*velqr(1)/rhoqr
 
     ! Sedimentation term using upstream differencing
-    do k=1,nz-1
-      sed(k) = dt0*(r(k+1)*qr(k+1)*velqr(k+1)-r(k)*qr(k)*velqr(k))/(r(k)*(z(k+1)-z(k)))
+    do k = 1, nz - 1
+      sed(k) = dt0*(r(k + 1)*qr(k + 1)*velqr(k + 1) - r(k)*qr(k)*velqr(k))/(r(k)*(z(k + 1) - z(k)))
     end do
-    sed(nz)  = -dt0*qr(nz)*velqr(nz)/(.5*(z(nz)-z(nz-1)))
+    sed(nz) = -dt0*qr(nz)*velqr(nz)/(.5*(z(nz) - z(nz - 1)))
 
     ! Adjustment terms
-    do k=1,nz
+    do k = 1, nz
 
       ! Autoconversion and accretion rates following KW eq. 2.13a,b
-      qrprod = qc(k) - (qc(k)-dt0*max(.001*(qc(k)-.001d0),0.d0))/(1.d0+dt0*2.2d0*qr(k)**.875)
-      qc(k) = max(qc(k)-qrprod,0.d0)
-      qr(k) = max(qr(k)+qrprod+sed(k),0.d0)
+      qrprod = qc(k) - (qc(k) - dt0*max(.001*(qc(k) - .001d0), 0.d0))/(1.d0 + dt0*2.2d0*qr(k)**.875)
+      qc(k) = max(qc(k) - qrprod, 0.d0)
+      qr(k) = max(qr(k) + qrprod + sed(k), 0.d0)
 
       ! Saturation vapor mixing ratio (gm/gm) following KW eq. 2.11
-      qvs = pc(k)*exp(f2x*(pk(k)*theta(k)-273.d0)   &
-             /(pk(k)*theta(k)- 36.d0))
-      prod = (qv(k)-qvs)/(1.d0+qvs*f5/(pk(k)*theta(k)-36.d0)**2)
+      qvs = pc(k)*exp(f2x*(pk(k)*theta(k) - 273.d0) &
+                      /(pk(k)*theta(k) - 36.d0))
+      prod = (qv(k) - qvs)/(1.d0 + qvs*f5/(pk(k)*theta(k) - 36.d0)**2)
 
       ! Evaporation rate following KW eq. 2.14a,b
-      ern = min(dt0*(((1.6d0+124.9d0*(r(k)*qr(k))**.2046)  &
-            *(r(k)*qr(k))**.525)/(2550000d0*pc(k)            &
-            /(3.8d0 *qvs)+540000d0))*(dim(qvs,qv(k))         &
-            /(r(k)*qvs)),max(-prod-qc(k),0.d0),qr(k))
+      ern = min(dt0*(((1.6d0 + 124.9d0*(r(k)*qr(k))**.2046) &
+                      *(r(k)*qr(k))**.525)/(2550000d0*pc(k) &
+                                            /(3.8d0*qvs) + 540000d0))*(dim(qvs, qv(k)) &
+                                                                       /(r(k)*qvs)), max(-prod - qc(k), 0.d0), qr(k))
 
       ! Saturation adjustment following KW eq. 3.10
-      theta(k)= theta(k) + 2500000d0/(1003.d0*pk(k))*(max( prod,-qc(k))-ern)
-      qv(k) = max(qv(k)-max(prod,-qc(k))+ern,0.d0)
-      qc(k) = qc(k)+max(prod,-qc(k))
-      qr(k) = qr(k)-ern
+      theta(k) = theta(k) + 2500000d0/(1003.d0*pk(k))*(max(prod, -qc(k)) - ern)
+      qv(k) = max(qv(k) - max(prod, -qc(k)) + ern, 0.d0)
+      qc(k) = qc(k) + max(prod, -qc(k))
+      qr(k) = qr(k) - ern
     end do
 
     ! Recalculate liquid water terminal velocity
     if (nt .ne. rainsplit) then
-      do k=1,nz
-        velqr(k)  = 36.34d0*(qr(k)*r(k))**0.1364*rhalf(k)
+      do k = 1, nz
+        velqr(k) = 36.34d0*(qr(k)*r(k))**0.1364*rhalf(k)
       end do
     end if
   end do
 
-  precl = precl / dble(rainsplit)
+  precl = precl/dble(rainsplit)
 
 END SUBROUTINE KESSLER
 

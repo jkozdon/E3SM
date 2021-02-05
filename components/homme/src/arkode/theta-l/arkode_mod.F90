@@ -4,23 +4,23 @@
 
 module arkode_mod
 
-  use element_state,                 only: timelevels
-  use derivative_mod,                only: derivative_t
-  use HommeNVector,                  only: NVec_t
-  use hybrid_mod,                    only: hybrid_t
-  use hybvcoord_mod,                 only: hvcoord_t
-  use kinds,                         only: real_kind
-  use fsundials_matrix_mod,          only: SUNMatrix
-  use fsundials_linearsolver_mod,    only: SUNLinearSolver
+  use element_state, only: timelevels
+  use derivative_mod, only: derivative_t
+  use HommeNVector, only: NVec_t
+  use hybrid_mod, only: hybrid_t
+  use hybvcoord_mod, only: hvcoord_t
+  use kinds, only: real_kind
+  use fsundials_matrix_mod, only: SUNMatrix
+  use fsundials_linearsolver_mod, only: SUNLinearSolver
   use fsundials_nonlinearsolver_mod, only: SUNNonlinearSolver
-  use fsundials_nvector_mod,         only: N_Vector
+  use fsundials_nvector_mod, only: N_Vector
   use iso_c_binding
 
   implicit none
 
   private
 
-  integer, parameter :: freelevels = timelevels-35
+  integer, parameter :: freelevels = timelevels - 35
   ! Note that 35 is an estimate, but needs to be at least > 30
   ! If a larger Krylov subspace is desired, timelevels should be
   ! increased.
@@ -91,7 +91,7 @@ contains
 
     !======= Inclusions ===========
     use farkode_arkstep_mod, only: FARKStepGetNumNonlinSolvIters
-    use parallel_mod,        only: abortmp
+    use parallel_mod, only: abortmp
 
     !======= Declarations =========
     implicit none
@@ -105,7 +105,6 @@ contains
     integer(c_long) :: num_iters(1)
 
     !======= Internals ============
-
 
     if (present(timesteps)) then
       num_timesteps = num_timesteps + timesteps
@@ -155,10 +154,10 @@ contains
                     MPI_SUM, master_rank, comm, ierr)
     if (my_rank == master_rank) then
       print *, 'ARKode Nonlinear Solver Statistics:'
-      print '(2x,A,i9)','Max num nonlin iters   =', max_result
-      print '(2x,A,i9)','Total num nonlin iters =', sum_result
-      print '(2x,A,i9)','Total num timesteps    =', num_timesteps
-      print '(2x,A,f9.2)','Avg num nonlin iters   =', sum_result/float(comm_size*num_timesteps)
+      print '(2x,A,i9)', 'Max num nonlin iters   =', max_result
+      print '(2x,A,i9)', 'Total num nonlin iters =', sum_result
+      print '(2x,A,i9)', 'Total num timesteps    =', num_timesteps
+      print '(2x,A,f9.2)', 'Avg num nonlin iters   =', sum_result/float(comm_size*num_timesteps)
     end if
 
     return
@@ -174,13 +173,13 @@ contains
     !-----------------------------------------------------------------
 
     !======= Inclusions ===========
-    use hybvcoord_mod,  only: hvcoord_t
+    use hybvcoord_mod, only: hvcoord_t
 
     !======= Declarations =========
     implicit none
 
     ! calling variables
-    type(hvcoord_t),    intent(out) :: hvcoord
+    type(hvcoord_t), intent(out) :: hvcoord
 
     !======= Internals ============
     hvcoord = hvcoord_ptr
@@ -234,29 +233,29 @@ contains
     !-----------------------------------------------------------------
 
     !======= Inclusions ===========
-    use arkode_tables,       only: butcher_table_set
-    use derivative_mod,      only: derivative_t
-    use element_mod,         only: element_t
-    use farkode_mod,         only: ARK_ONE_STEP
+    use arkode_tables, only: butcher_table_set
+    use derivative_mod, only: derivative_t
+    use element_mod, only: element_t
+    use farkode_mod, only: ARK_ONE_STEP
     use farkode_arkstep_mod, only: FARKStepEvolve, FARKStepSetFixedStep
-    use HommeNVector,        only: MakeHommeNVector, SetHommeNVectorPar
-    use hybrid_mod,          only: hybrid_t
-    use hybvcoord_mod,       only: hvcoord_t
-    use kinds,               only: real_kind
-    use parallel_mod,        only: abortmp
+    use HommeNVector, only: MakeHommeNVector, SetHommeNVectorPar
+    use hybrid_mod, only: hybrid_t
+    use hybvcoord_mod, only: hvcoord_t
+    use kinds, only: real_kind
+    use parallel_mod, only: abortmp
 
     !======= Declarations =========
     implicit none
 
     ! calling variables
     type(derivative_t), target, intent(in) :: deriv
-    type(hvcoord_t), target,    intent(in) :: hvcoord
-    type(hybrid_t), target,     intent(in) :: hybrid
-    type(parameter_list),       intent(in) :: arkode_parameters
-    type(butcher_table_set),    intent(in) :: table_set
-    real(real_kind),            intent(in) :: dt, eta_ave_w
-    integer,                    intent(in) :: nets, nete, n0, np1, qn0
-    type(element_t),            intent(inout) :: elem(:)
+    type(hvcoord_t), target, intent(in) :: hvcoord
+    type(hybrid_t), target, intent(in) :: hybrid
+    type(parameter_list), intent(in) :: arkode_parameters
+    type(butcher_table_set), intent(in) :: table_set
+    real(real_kind), intent(in) :: dt, eta_ave_w
+    integer, intent(in) :: nets, nete, n0, np1, qn0
+    type(element_t), intent(inout) :: elem(:)
 
     ! local variables
     real(real_kind)              :: tstart
@@ -280,7 +279,7 @@ contains
     hvcoord_ptr => hvcoord
 
     ! Initialize or reinitialize ARKode
-    if (.not.initialized) then
+    if (.not. initialized) then
       call initialize(elem, nets, nete, hybrid%par, n0, qn0, tstart, &
                       arkode_parameters, table_set)
       initialized = .true.
@@ -292,7 +291,7 @@ contains
     ierr = FARKStepSetFixedStep(arkode_mem, dt)
     if (ierr /= 0) then
       call abortmp('FARKStepSetFixedStep failed')
-    endif
+    end if
 
     ! Take single step
     tstop(1) = tstart + dt
@@ -314,17 +313,17 @@ contains
     !======= Inclusions ===========
     use farkode_arkstep_mod, only: FARKStepSetMaxNonlinIters, FARKStepReInit, &
                                    FARKStepSVtolerances
-    use HommeNVector,        only: FN_VGetContent
-    use kinds,               only: real_kind
-    use parallel_mod,        only: abortmp
+    use HommeNVector, only: FN_VGetContent
+    use kinds, only: real_kind
+    use parallel_mod, only: abortmp
 
     !======= Declarations =========
     implicit none
 
     ! calling variables
     type(parameter_list), target, intent(in)  :: arkode_parameters
-    integer,                      intent(in)  :: n0
-    real(real_kind),              intent(in)  :: tstart
+    integer, intent(in)  :: n0
+    real(real_kind), intent(in)  :: tstart
 
     ! local variables
     type(NVec_t), pointer         :: atol_content => NULL()
@@ -339,31 +338,31 @@ contains
 
     ! update rtol and atol
     tl = atol_content%tl_idx
-    do ie=atol_content%nets,atol_content%nete
-      atol_content%elem(ie)%state%v(:,:,1,:,tl) = ap%atol(1)
-      atol_content%elem(ie)%state%v(:,:,2,:,tl) = ap%atol(2)
-      atol_content%elem(ie)%state%w_i(:,:,:,tl) = ap%atol(3)
-      atol_content%elem(ie)%state%phinh_i(:,:,:,tl) = ap%atol(4)
-      atol_content%elem(ie)%state%vtheta_dp(:,:,:,tl) = ap%atol(5)
-      atol_content%elem(ie)%state%dp3d(:,:,:,tl) = ap%atol(6)
+    do ie = atol_content%nets, atol_content%nete
+      atol_content%elem(ie)%state%v(:, :, 1, :, tl) = ap%atol(1)
+      atol_content%elem(ie)%state%v(:, :, 2, :, tl) = ap%atol(2)
+      atol_content%elem(ie)%state%w_i(:, :, :, tl) = ap%atol(3)
+      atol_content%elem(ie)%state%phinh_i(:, :, :, tl) = ap%atol(4)
+      atol_content%elem(ie)%state%vtheta_dp(:, :, :, tl) = ap%atol(5)
+      atol_content%elem(ie)%state%dp3d(:, :, :, tl) = ap%atol(6)
     end do
     ierr = FARKStepSVtolerances(arkode_mem, ap%rtol, atol%ptr)
     if (ierr /= 0) then
       call abortmp('FARKStepSVtolerances failed')
-    endif
+    end if
 
     ! reinitialize ARKode with current solution
     ierr = FARKStepReInit(arkode_mem, efun_ptr, ifun_ptr, tstart, y(n0)%ptr)
     if (ierr /= 0) then
       call abortmp('FARKStepReInit failed')
-    endif
+    end if
 
     if (c_associated(ifun_ptr)) then
       ! reset max number of nonlinear iterations per stage
       ierr = FARKStepSetMaxNonlinIters(arkode_mem, max_niters)
       if (ierr /= 0) then
         call abortmp('FARKStepSetMaxNonlinIters failed')
-      endif
+      end if
     end if
 
     return
@@ -388,33 +387,33 @@ contains
     !-----------------------------------------------------------------
 
     !======= Inclusions ===========
-    use arkode_tables,            only: butcher_table_set
-    use element_mod,              only: element_t
-    use farkode_mod,              only: FARKodeButcherTable_Create
-    use farkode_arkstep_mod,      only: FARKStepCreate, FARKStepSetTables, &
-                                        FARKStepSetMaxNonlinIters, FARKStepSVtolerances, &
-                                        FARKStepSetDiagnostics, FARKStepWriteParameters, &
-                                        FARKStepSetLinearSolver, &
-                                        FARKStepSetLinearSolutionScaling, &
-                                        FARKStepSetLinSysFn, FARKStepSetEpsLin, &
-                                        FARKStepSetNonlinearSolver
-    use HommeNVector,             only: NVec_t, MakeHommeNVector, SetHommeNVectorPar
-    use HommeSUNLinSol,           only: FSUNMatrix_HOMME, FSUNLinSol_HOMME, FARKodeLinSysFn
+    use arkode_tables, only: butcher_table_set
+    use element_mod, only: element_t
+    use farkode_mod, only: FARKodeButcherTable_Create
+    use farkode_arkstep_mod, only: FARKStepCreate, FARKStepSetTables, &
+                                   FARKStepSetMaxNonlinIters, FARKStepSVtolerances, &
+                                   FARKStepSetDiagnostics, FARKStepWriteParameters, &
+                                   FARKStepSetLinearSolver, &
+                                   FARKStepSetLinearSolutionScaling, &
+                                   FARKStepSetLinSysFn, FARKStepSetEpsLin, &
+                                   FARKStepSetNonlinearSolver
+    use HommeNVector, only: NVec_t, MakeHommeNVector, SetHommeNVectorPar
+    use HommeSUNLinSol, only: FSUNMatrix_HOMME, FSUNLinSol_HOMME, FARKodeLinSysFn
     use fsunnonlinsol_newton_mod, only: FSUNNonlinSol_Newton, FSUNNonlinSolSetConvTestFn_Newton
-    use fsunlinsol_spgmr_mod,     only: FSUNLinSol_SPGMR, FSUNLinSol_SPGMRSetGSType
-    use kinds,                    only: real_kind
-    use parallel_mod,             only: parallel_t, abortmp
+    use fsunlinsol_spgmr_mod, only: FSUNLinSol_SPGMR, FSUNLinSol_SPGMRSetGSType
+    use kinds, only: real_kind
+    use parallel_mod, only: parallel_t, abortmp
 
     !======= Declarations =========
     implicit none
 
     ! calling variables
-    type(parallel_t),                   intent(in) :: par
-    type(parameter_list), target,       intent(in) :: arkode_parameters
-    type(butcher_table_set), target,    intent(in) :: table_set
-    real(real_kind),                    intent(in) :: tstart
-    integer,                            intent(in) :: nets, nete, n0, qn0
-    type(element_t),                    intent(inout) :: elem(:)
+    type(parallel_t), intent(in) :: par
+    type(parameter_list), target, intent(in) :: arkode_parameters
+    type(butcher_table_set), target, intent(in) :: table_set
+    real(real_kind), intent(in) :: tstart
+    integer, intent(in) :: nets, nete, n0, qn0
+    type(element_t), intent(inout) :: elem(:)
 
     ! local variables
     type(parameter_list), pointer          :: ap
@@ -431,11 +430,11 @@ contains
     ap => arkode_parameters
     ts => table_set
 
-    if (par%masterproc) print *,"Initializing ARKode"
+    if (par%masterproc) print *, "Initializing ARKode"
     ! 'create' NVec_t objects that will correspond to the original 3 HOMME
     ! timelevels, assuming that tl%nm1, tl%n0, and tl%np1 are taken from the
     ! set {1,2,3}
-    do i=1,3
+    do i = 1, 3
       y(i)%ptr => MakeHommeNVector(elem, nets, nete, i, ierr)
       if (ierr /= 0) then
         call abortmp('Error in MakeHommeNVector')
@@ -444,13 +443,13 @@ contains
 
     ! save rtol, set data in 4th timelevel to atol values,
     ! and 'create' NVec_t object
-    do i=nets,nete
-      elem(i)%state%v(:,:,1,:,4) = ap%atol(1)
-      elem(i)%state%v(:,:,2,:,4) = ap%atol(2)
-      elem(i)%state%w_i(:,:,:,4) = ap%atol(3)
-      elem(i)%state%phinh_i(:,:,:,4) = ap%atol(4)
-      elem(i)%state%vtheta_dp(:,:,:,4) = ap%atol(5)
-      elem(i)%state%dp3d(:,:,:,4) = ap%atol(6)
+    do i = nets, nete
+      elem(i)%state%v(:, :, 1, :, 4) = ap%atol(1)
+      elem(i)%state%v(:, :, 2, :, 4) = ap%atol(2)
+      elem(i)%state%w_i(:, :, :, 4) = ap%atol(3)
+      elem(i)%state%phinh_i(:, :, :, 4) = ap%atol(4)
+      elem(i)%state%vtheta_dp(:, :, :, 4) = ap%atol(5)
+      elem(i)%state%dp3d(:, :, :, 4) = ap%atol(6)
     end do
     atol%ptr => MakeHommeNVector(elem, nets, nete, 4, ierr)
     if (ierr /= 0) then
@@ -481,9 +480,9 @@ contains
     if (c_associated(ifun_ptr)) then
 
       ! flatten Ai to C array (row-major)
-      do i=1,ts%s
-        do j = 1,ts%s
-          a(ts%s*(i-1)+j) = ts%Ai(i,j)
+      do i = 1, ts%s
+        do j = 1, ts%s
+          a(ts%s*(i - 1) + j) = ts%Ai(i, j)
         end do
       end do
       ! create implicit table
@@ -493,9 +492,9 @@ contains
     ! Set ERK Butcher table for explicit or ARK problems
     if (c_associated(efun_ptr)) then
       ! flatten Ae to C array (row-major)
-      do i=1,ts%s
-        do j = 1,ts%s
-          a(ts%s*(i-1)+j) = ts%Ae(i,j)
+      do i = 1, ts%s
+        do j = 1, ts%s
+          a(ts%s*(i - 1) + j) = ts%Ae(i, j)
         end do
       end do
       ! create explicit table
@@ -510,100 +509,99 @@ contains
       call abortmp('FARKStepSetTables failed')
     end if
 
-
     ! Set solver if implicit or imex problem
     if (c_associated(ifun_ptr)) then
 
-       nullify(sunmat)
-       nullify(sunls)
-       nullify(sunnls)
+      nullify (sunmat)
+      nullify (sunls)
+      nullify (sunnls)
 
-       if (use_column_solver) then
+      if (use_column_solver) then
 
-          ! create a dummy matrix
-          sunmat => FSUNMatrix_HOMME()
-          if (.not.associated(sunmat)) then
-             call abortmp('arkode_init: FSUNMatrix_HOMME failed')
-          end if
+        ! create a dummy matrix
+        sunmat => FSUNMatrix_HOMME()
+        if (.not. associated(sunmat)) then
+          call abortmp('arkode_init: FSUNMatrix_HOMME failed')
+        end if
 
-          ! create the HOMME columnwise direct solver wrapper
-          sunls => FSUNLinSol_HOMME(arkode_mem)
-          if (.not.associated(sunls)) then
-             call abortmp('arkode_init: FSUNLinSol_HOMME failed')
-          end if
+        ! create the HOMME columnwise direct solver wrapper
+        sunls => FSUNLinSol_HOMME(arkode_mem)
+        if (.not. associated(sunls)) then
+          call abortmp('arkode_init: FSUNLinSol_HOMME failed')
+        end if
 
-       else
+      else
 
-          ! use the SUNDIALS GMRES linear solver (and set options)
-          sunls => FSUNLinSol_SPGMR(y(n0)%ptr, ap%precLR, ap%maxl)
-          if (.not.associated(sunls)) then
-             call abortmp('arkode_init: FSUNLinSol_SPGMR failed')
-          end if
+        ! use the SUNDIALS GMRES linear solver (and set options)
+        sunls => FSUNLinSol_SPGMR(y(n0)%ptr, ap%precLR, ap%maxl)
+        if (.not. associated(sunls)) then
+          call abortmp('arkode_init: FSUNLinSol_SPGMR failed')
+        end if
 
-          ! set the orthogonalization type
-          ierr = FSUNLinSol_SPGMRSetGSType(sunls, ap%gstype)
-          if (ierr /= 0) then
-             call abortmp('arkode_init: FSUNLinSol_SPGMRSetGSType failed')
-          end if
+        ! set the orthogonalization type
+        ierr = FSUNLinSol_SPGMRSetGSType(sunls, ap%gstype)
+        if (ierr /= 0) then
+          call abortmp('arkode_init: FSUNLinSol_SPGMRSetGSType failed')
+        end if
 
-       endif
+      end if
 
-       ! attach the linear solver and matrix to ARKode
-       ierr = FARKStepSetLinearSolver(arkode_mem, sunls, sunmat)
-       if (ierr /= 0) then
+      ! attach the linear solver and matrix to ARKode
+      ierr = FARKStepSetLinearSolver(arkode_mem, sunls, sunmat)
+      if (ierr /= 0) then
+        call abortmp('arkode_init: FARKStepSetLinearSolver failed')
+      end if
+
+      ! set linear solver related options
+      if (use_column_solver) then
+
+        ! set a dummy linear system function
+        ierr = FARKStepSetLinSysFn(arkode_mem, c_funloc(FARKodeLinSysFn))
+        if (ierr /= 0) then
           call abortmp('arkode_init: FARKStepSetLinearSolver failed')
-       end if
+        end if
 
-       ! set linear solver related options
-       if (use_column_solver) then
+        ! disable linear system solution scaling
+        ierr = FARKStepSetLinearSolutionScaling(arkode_mem, 0)
+        if (ierr /= 0) then
+          call abortmp('arkode_init: FARKStepSetLinearSolver failed')
+        end if
 
-          ! set a dummy linear system function
-          ierr = FARKStepSetLinSysFn(arkode_mem, c_funloc(FARKodeLinSysFn))
-          if (ierr /= 0) then
-             call abortmp('arkode_init: FARKStepSetLinearSolver failed')
-          end if
+      else
 
-          ! disable linear system solution scaling
-          ierr = FARKStepSetLinearSolutionScaling(arkode_mem, 0)
-          if (ierr /= 0) then
-             call abortmp('arkode_init: FARKStepSetLinearSolver failed')
-          end if
+        ! set the linear solve tolerance factor
+        ierr = FARKStepSetEpsLin(arkode_mem, ap%lintol)
+        if (ierr /= 0) then
+          call abortmp('arkode_init: FARKSpilsSetEpsLin failed')
+        end if
 
-       else
+      end if
 
-          ! set the linear solve tolerance factor
-          ierr = FARKStepSetEpsLin(arkode_mem, ap%lintol)
-          if (ierr /= 0) then
-             call abortmp('arkode_init: FARKSpilsSetEpsLin failed')
-          end if
+      ! create SUNDIALS Newton solver
+      sunnls => FSUNNonlinSol_Newton(y(n0)%ptr)
+      if (.not. associated(sunnls)) then
+        call abortmp('arkode_init: FSUNNonlinSol_Newton failed')
+      end if
 
-       end if
+      ! attach the nonlinear solver
+      ierr = FARKStepSetNonlinearSolver(arkode_mem, sunnls)
+      if (ierr /= 0) then
+        call abortmp('arkode_init: FARKStepSetNonlinearSolver failed')
+      end if
 
-       ! create SUNDIALS Newton solver
-       sunnls => FSUNNonlinSol_Newton(y(n0)%ptr)
-       if (.not.associated(sunnls)) then
-          call abortmp('arkode_init: FSUNNonlinSol_Newton failed')
-       end if
+      ! set custom convergence test function
+      ierr = FSUNNonlinSolSetConvTestFn_Newton(sunnls, c_funloc(convtest), c_null_ptr)
+      if (ierr /= 0) then
+        call abortmp('arkode_init: FSUNNonlinSolSetConvTestFn_Newton failed')
+      end if
 
-       ! attach the nonlinear solver
-       ierr = FARKStepSetNonlinearSolver(arkode_mem, sunnls)
-       if (ierr /= 0) then
-          call abortmp('arkode_init: FARKStepSetNonlinearSolver failed')
-       endif
+      ! set max number of nonlinear iterations per stage
+      ierr = FARKStepSetMaxNonlinIters(arkode_mem, max_niters)
+      if (ierr /= 0) then
+        call abortmp('arkode_init: FARKStepSetMaxNonlinIters failed')
+      end if
 
-       ! set custom convergence test function
-       ierr = FSUNNonlinSolSetConvTestFn_Newton(sunnls, c_funloc(convtest), c_null_ptr)
-       if (ierr /= 0) then
-          call abortmp('arkode_init: FSUNNonlinSolSetConvTestFn_Newton failed')
-       endif
-
-       ! set max number of nonlinear iterations per stage
-       ierr = FARKStepSetMaxNonlinIters(arkode_mem, max_niters)
-       if (ierr /= 0) then
-          call abortmp('arkode_init: FARKStepSetMaxNonlinIters failed')
-       endif
-
-    endif
+    end if
 
     return
   end subroutine initialize
@@ -625,10 +623,10 @@ contains
     !-----------------------------------------------------------------
     use, intrinsic :: iso_c_binding
 
-    use fsundials_nvector_mod,         only: FN_VWrmsNorm
+    use fsundials_nvector_mod, only: FN_VWrmsNorm
     use fsundials_nonlinearsolver_mod, only: FSUNNonlinSolGetCurIter, &
-         SUN_NLS_SUCCESS, &
-         SUN_NLS_CONTINUE
+                                             SUN_NLS_SUCCESS, &
+                                             SUN_NLS_CONTINUE
 
     implicit none
 
@@ -649,27 +647,27 @@ contains
     ! get the current nonlinear solver iteration
     ierr = FSUNNonlinSolGetCurIter(sunnls, citer)
     if (ierr /= 0) then
-       return
+      return
     end if
 
     ! update the convergence rate
     if (citer(1) == 0) then
-       crate = 1.0d0
+      crate = 1.0d0
     else
-       crate = max(0.3d0 * crate, delnrm / delp)
+      crate = max(0.3d0*crate, delnrm/delp)
     end if
 
     ! save norm for next iteration
     delp = delnrm
 
     ! compute scaled norm to test convergence
-    dcon = min(crate, 1.0d0) * delnrm / tol
+    dcon = min(crate, 1.0d0)*delnrm/tol
 
     ! check for convergence
     if (dcon < 1.0d0) then
-       ierr = SUN_NLS_SUCCESS
+      ierr = SUN_NLS_SUCCESS
     else
-       ierr = SUN_NLS_CONTINUE
+      ierr = SUN_NLS_CONTINUE
     end if
 
   end function convtest

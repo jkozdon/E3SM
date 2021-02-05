@@ -1,10 +1,10 @@
 module elem_ops_interface
 
-  use iso_c_binding,  only: c_int, c_bool, c_ptr, c_f_pointer
+  use iso_c_binding, only: c_int, c_bool, c_ptr, c_f_pointer
   use dimensions_mod, only: nlev, nlevp, np
-  use kinds,          only: real_kind 
-  use hybvcoord_mod,  only: hvcoord_t 
-  use parallel_mod,   only: abortmp
+  use kinds, only: real_kind
+  use hybvcoord_mod, only: hvcoord_t
+  use parallel_mod, only: abortmp
 
   implicit none
 
@@ -15,12 +15,12 @@ module elem_ops_interface
   public :: compute_r_star_f90
 contains
 
-  subroutine init_f90 (hyai, ps0) bind(c)
+  subroutine init_f90(hyai, ps0) bind(c)
     !
     ! Inputs
     !
-    real (kind=real_kind), intent(in) :: hyai(nlevp)
-    real (kind=real_kind), intent(in) :: ps0
+    real(kind=real_kind), intent(in) :: hyai(nlevp)
+    real(kind=real_kind), intent(in) :: ps0
 
     hvcoord%hyai = hyai
     hvcoord%ps0 = ps0
@@ -32,23 +32,23 @@ contains
     !
     ! Inputs
     !
-    integer (kind=c_int), intent(in) :: num_elems
-    type (c_ptr), intent(in) :: dp_ptr, theta_ref_ptr
+    integer(kind=c_int), intent(in) :: num_elems
+    type(c_ptr), intent(in) :: dp_ptr, theta_ref_ptr
 
     !
     ! Locals
     !
-    real (kind=real_kind), dimension(:,:,:,:),  pointer :: dp, theta_ref
+    real(kind=real_kind), dimension(:, :, :, :), pointer :: dp, theta_ref
     integer :: ie
 
-    call c_f_pointer(dp_ptr,        dp,        [np,np,nlev,num_elems])
-    call c_f_pointer(theta_ref_ptr, theta_ref, [np,np,nlev,num_elems])
+    call c_f_pointer(dp_ptr, dp, [np, np, nlev, num_elems])
+    call c_f_pointer(theta_ref_ptr, theta_ref, [np, np, nlev, num_elems])
 
-    do ie=1,num_elems
-      call set_theta_ref(hvcoord,             &
-                         dp(:,:,:,ie),        &
-                         theta_ref(:,:,:,ie))
-    enddo
+    do ie = 1, num_elems
+      call set_theta_ref(hvcoord, &
+                         dp(:, :, :, ie), &
+                         theta_ref(:, :, :, ie))
+    end do
   end subroutine set_theta_ref_f90
 
   subroutine compute_r_star_f90(num_elems, moist, Q_ptr, R_ptr) bind(c)
@@ -57,24 +57,24 @@ contains
     !
     ! Inputs
     !
-    integer (kind=c_int), intent(in) :: num_elems
-    logical (kind=c_bool), intent(in) :: moist
-    type (c_ptr), intent(in) :: Q_ptr, R_ptr
+    integer(kind=c_int), intent(in) :: num_elems
+    logical(kind=c_bool), intent(in) :: moist
+    type(c_ptr), intent(in) :: Q_ptr, R_ptr
 
     !
     ! Locals
     !
-    real (kind=real_kind), dimension(:,:,:,:),  pointer :: Q, R
+    real(kind=real_kind), dimension(:, :, :, :), pointer :: Q, R
     integer :: ie
 
     use_moisture = moist
 
-    call c_f_pointer(Q_ptr, Q, [np,np,nlev,num_elems])
-    call c_f_pointer(R_ptr, R, [np,np,nlev,num_elems])
+    call c_f_pointer(Q_ptr, Q, [np, np, nlev, num_elems])
+    call c_f_pointer(R_ptr, R, [np, np, nlev, num_elems])
 
-    do ie=1,num_elems
-      call get_R_star(R(:,:,:,ie),Q(:,:,:,ie))
-    enddo
+    do ie = 1, num_elems
+      call get_R_star(R(:, :, :, ie), Q(:, :, :, ie))
+    end do
   end subroutine compute_R_star_f90
 
 end module elem_ops_interface

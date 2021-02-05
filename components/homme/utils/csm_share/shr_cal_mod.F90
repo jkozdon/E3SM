@@ -9,12 +9,12 @@
 ! !DESCRIPTION:
 !   These calendar routines do conversions between...
 !   \begin{itemize}
-!   \item the integer number of elapsed days 
+!   \item the integer number of elapsed days
 !   \item the integers year, month, day (three inter-related integers)
 !   \item the integer coded calendar date (yyyymmdd)
 !   \end{itemize}
-!   Possible uses include: a calling routine can increment the elapsed days 
-!   integer and use this module to determine what the corresponding calendar 
+!   Possible uses include: a calling routine can increment the elapsed days
+!   integer and use this module to determine what the corresponding calendar
 !   date is;  this module can be used to determine how many days apart two
 !   arbitrary calendar dates are.
 !
@@ -24,8 +24,8 @@
 ! !REMARKS:
 !   Following are some internal assumptions.  These assumptions are somewhat
 !   arbitrary -- they were chosen because they result in the simplest code given
-!   the requirements of this module.  These assumptions can be relaxed as 
-!   necessary: 
+!   the requirements of this module.  These assumptions can be relaxed as
+!   necessary:
 !   o the valid range of years is [0,9999]
 !   o elapsed days = 0 <=> January 1st, year 0000
 !   o all years have 365 days (no leap years)
@@ -42,59 +42,58 @@ module shr_cal_mod
 
 ! !USES:
 
-   use shr_kind_mod   ! kinds
-   use shr_const_mod  ! constants
-   use shr_sys_mod    ! system
+  use shr_kind_mod   ! kinds
+  use shr_const_mod  ! constants
+  use shr_sys_mod    ! system
 
-   implicit none
+  implicit none
 
-   private ! except
+  private ! except
 
-! !PUBLIC TYPES: 
- 
-   ! none
+! !PUBLIC TYPES:
+
+  ! none
 
 ! !PUBLIC MEMBER FUNCTIONS:
 
-   public :: shr_cal_set        ! converts elapsed days to coded-date
-   public :: shr_cal_get        ! converts elapsed days to coded-date
-   public :: shr_cal_eday2date  ! converts elapsed days to coded-date
-   public :: shr_cal_eday2ymd   ! converts elapsed days to yr,month,day
-   public :: shr_cal_date2ymd   ! converts coded-date   to yr,month,day
-   public :: shr_cal_date2eday  ! converts coded-date   to elapsed days
-   public :: shr_cal_ymd2date   ! converts yr,month,day to coded-date
-   public :: shr_cal_ymd2eday   ! converts yr,month,day to elapsed days
-   public :: shr_cal_advDate    ! advance date/secs
-   public :: shr_cal_validDate  ! logical function: is coded-date valid?
-   public :: shr_cal_validYMD   ! logical function: are yr,month,day valid?
-   public :: shr_cal_validHMS   ! logical function: are hr, min, sec valid?
-   public :: shr_cal_numDaysinMonth     ! number of days in a month
-   public :: shr_cal_elapsDaysStrtMonth ! elapsed days on start of month
-   public :: shr_cal_getDebug   ! get internal debug level
-   public :: shr_cal_setDebug   ! set internal debug level
+  public :: shr_cal_set        ! converts elapsed days to coded-date
+  public :: shr_cal_get        ! converts elapsed days to coded-date
+  public :: shr_cal_eday2date  ! converts elapsed days to coded-date
+  public :: shr_cal_eday2ymd   ! converts elapsed days to yr,month,day
+  public :: shr_cal_date2ymd   ! converts coded-date   to yr,month,day
+  public :: shr_cal_date2eday  ! converts coded-date   to elapsed days
+  public :: shr_cal_ymd2date   ! converts yr,month,day to coded-date
+  public :: shr_cal_ymd2eday   ! converts yr,month,day to elapsed days
+  public :: shr_cal_advDate    ! advance date/secs
+  public :: shr_cal_validDate  ! logical function: is coded-date valid?
+  public :: shr_cal_validYMD   ! logical function: are yr,month,day valid?
+  public :: shr_cal_validHMS   ! logical function: are hr, min, sec valid?
+  public :: shr_cal_numDaysinMonth     ! number of days in a month
+  public :: shr_cal_elapsDaysStrtMonth ! elapsed days on start of month
+  public :: shr_cal_getDebug   ! get internal debug level
+  public :: shr_cal_setDebug   ! set internal debug level
 
 ! !PUBLIC DATA MEMBERS:
 
-   ! none
+  ! none
 
 !EOP
 
-   !----- local -----
-   character(SHR_KIND_CL),save    :: calendar_type='noleap' ! calendar type
-   integer(SHR_KIND_IN),parameter :: shr_cal_nvalidTypes = 2
-   character(*),parameter :: &
-     shr_cal_validTypes(shr_cal_nvalidTypes) = (/'noleap    ', &
-                                                 '365_day   '/)
+  !----- local -----
+  character(SHR_KIND_CL), save    :: calendar_type = 'noleap' ! calendar type
+  integer(SHR_KIND_IN), parameter :: shr_cal_nvalidTypes = 2
+  character(*), parameter :: &
+    shr_cal_validTypes(shr_cal_nvalidTypes) = (/'noleap    ', &
+                                                '365_day   '/)
 
-   !--- this is the noleap calendar ---
-   integer(SHR_KIND_IN),parameter :: dsm(12) = &     ! elapsed Days on Start of Month
-   &                    (/ 0,31,59, 90,120,151, 181,212,243, 273,304,334/)
-   integer(SHR_KIND_IN),parameter :: dpm(12) = &     ! Days Per Month
-   &                    (/31,28,31, 30, 31, 30,  31, 31, 30,  31, 30, 31/)
+  !--- this is the noleap calendar ---
+  integer(SHR_KIND_IN), parameter :: dsm(12) = &     ! elapsed Days on Start of Month
+  &                    (/0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334/)
+  integer(SHR_KIND_IN), parameter :: dpm(12) = &     ! Days Per Month
+  &                    (/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/)
 
-
-   !--- trigger internal debug output ---
-   integer(SHR_KIND_IN) :: debug = 0
+  !--- trigger internal debug output ---
+  integer(SHR_KIND_IN) :: debug = 0
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 contains
@@ -113,35 +112,35 @@ contains
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-subroutine shr_cal_set(ctype)
+  subroutine shr_cal_set(ctype)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*),intent(in)  :: ctype   ! calendar type
+    character(*), intent(in)  :: ctype   ! calendar type
 
 !EOP
 
-   !--- local ---
-   integer(SHR_KIND_IN)  :: n   ! counter
-   logical :: found             ! check for valid type
+    !--- local ---
+    integer(SHR_KIND_IN)  :: n   ! counter
+    logical :: found             ! check for valid type
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   found = .false.
-   do n = 1,shr_cal_nvalidTypes
-     if (trim(ctype) == trim(shr_cal_validTypes(n))) then
-       calendar_type = trim(ctype)
-       found = .true.
-     endif
-   enddo
+    found = .false.
+    do n = 1, shr_cal_nvalidTypes
+      if (trim(ctype) == trim(shr_cal_validTypes(n))) then
+        calendar_type = trim(ctype)
+        found = .true.
+      end if
+    end do
 
-   if (.not.found) call shr_sys_abort('shr_cal_set ERROR illegal calendar type')
+    if (.not. found) call shr_sys_abort('shr_cal_set ERROR illegal calendar type')
 
-end subroutine shr_cal_set
+  end subroutine shr_cal_set
 
 !===============================================================================
 !BOP ===========================================================================
@@ -156,13 +155,13 @@ end subroutine shr_cal_set
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-subroutine shr_cal_get(ctype)
+  subroutine shr_cal_get(ctype)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   character(*),intent(out)  :: ctype   ! calendar type
+    character(*), intent(out)  :: ctype   ! calendar type
 
 !EOP
 
@@ -170,9 +169,9 @@ subroutine shr_cal_get(ctype)
 !
 !-------------------------------------------------------------------------------
 
-   ctype = calendar_type
+    ctype = calendar_type
 
-end subroutine shr_cal_get
+  end subroutine shr_cal_get
 
 !===============================================================================
 !BOP ===========================================================================
@@ -187,35 +186,35 @@ end subroutine shr_cal_get
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-subroutine shr_cal_eday2date(eday,date)
+  subroutine shr_cal_eday2date(eday, date)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in)  :: eday  ! number of elapsed days
-   integer(SHR_KIND_IN),intent(out) :: date  ! coded (yyyymmdd) calendar date
+    integer(SHR_KIND_IN), intent(in)  :: eday  ! number of elapsed days
+    integer(SHR_KIND_IN), intent(out) :: date  ! coded (yyyymmdd) calendar date
 
 !EOP
 
-   !--- local ---
-   integer(SHR_KIND_IN) :: k,year,month,day
+    !--- local ---
+    integer(SHR_KIND_IN) :: k, year, month, day
 
 !-------------------------------------------------------------------------------
 ! ASSUMPTIONS:
 !   this calendar has a year zero (but no day or month zero)
 !-------------------------------------------------------------------------------
 
-   year = eday/365       ! calendar year (note: Fortran truncation)
-   day  = mod(eday,365)  ! elapsed days within current year
-   do k=1,12
-     IF (day >= dsm(k)) month=k   ! calendar month
-   end do
-   day = day-dsm(month) + 1         ! calendar day
-  
-   date = year*10000 + month*100 + day  ! coded calendar date
+    year = eday/365       ! calendar year (note: Fortran truncation)
+    day = mod(eday, 365)  ! elapsed days within current year
+    do k = 1, 12
+      IF (day >= dsm(k)) month = k   ! calendar month
+    end do
+    day = day - dsm(month) + 1         ! calendar day
 
-end subroutine shr_cal_eday2date
+    date = year*10000 + month*100 + day  ! coded calendar date
+
+  end subroutine shr_cal_eday2date
 
 !===============================================================================
 !BOP ===========================================================================
@@ -230,33 +229,33 @@ end subroutine shr_cal_eday2date
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-subroutine shr_cal_eday2ymd (eday,year,month,day)
+  subroutine shr_cal_eday2ymd(eday, year, month, day)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in)  :: eday             ! elapsed days
-   integer(SHR_KIND_IN),intent(out) :: year,month,day   ! calendar year,month,day
+    integer(SHR_KIND_IN), intent(in)  :: eday             ! elapsed days
+    integer(SHR_KIND_IN), intent(out) :: year, month, day   ! calendar year,month,day
 
 !EOP
 
-   !--- local ---
-   integer(SHR_KIND_IN) :: k
+    !--- local ---
+    integer(SHR_KIND_IN) :: k
 
 !-------------------------------------------------------------------------------
 ! ASSUMPTIONS:
 !   this calendar has a year zero (but no day or month zero)
 !-------------------------------------------------------------------------------
 
-   year = eday/365       ! calendar year (note: Fortran truncation)
-   day  = mod(eday,365)  ! elapsed days within current year
-   do k=1,12
-     IF (day .ge. dsm(k)) month=k   ! calendar month
-   end do
-   day = day-dsm(month) + 1         ! calendar day
+    year = eday/365       ! calendar year (note: Fortran truncation)
+    day = mod(eday, 365)  ! elapsed days within current year
+    do k = 1, 12
+      IF (day .ge. dsm(k)) month = k   ! calendar month
+    end do
+    day = day - dsm(month) + 1         ! calendar day
 
-end subroutine shr_cal_eday2ymd 
+  end subroutine shr_cal_eday2ymd
 
 !===============================================================================
 !BOP ===========================================================================
@@ -271,14 +270,14 @@ end subroutine shr_cal_eday2ymd
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-subroutine shr_cal_date2ymd (date,year,month,day)
+  subroutine shr_cal_date2ymd(date, year, month, day)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in)  :: date             ! coded-date (yyyymmdd)
-   integer(SHR_KIND_IN),intent(out) :: year,month,day   ! calendar year,month,day
+    integer(SHR_KIND_IN), intent(in)  :: date             ! coded-date (yyyymmdd)
+    integer(SHR_KIND_IN), intent(out) :: year, month, day   ! calendar year,month,day
 
 !EOP
 
@@ -286,15 +285,15 @@ subroutine shr_cal_date2ymd (date,year,month,day)
 !
 !-------------------------------------------------------------------------------
 
-   if (.not. shr_cal_validDate(date)) then
-      write(6,*) "(cal_date2ymd) ERROR: invalid date = ",date
-   endif
+    if (.not. shr_cal_validDate(date)) then
+      write (6, *) "(cal_date2ymd) ERROR: invalid date = ", date
+    end if
 
-   year =int(     date       /10000)
-   month=int( mod(date,10000)/  100)
-   day  =     mod(date,  100) 
+    year = int(date/10000)
+    month = int(mod(date, 10000)/100)
+    day = mod(date, 100)
 
-end subroutine shr_cal_date2ymd 
+  end subroutine shr_cal_date2ymd
 
 !===============================================================================
 !BOP ===========================================================================
@@ -309,34 +308,34 @@ end subroutine shr_cal_date2ymd
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-subroutine shr_cal_date2eday(date,eday)
+  subroutine shr_cal_date2eday(date, eday)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in ) :: date            ! coded (yyyymmdd) calendar date
-   integer(SHR_KIND_IN),intent(out) :: eday            ! number of elapsed days
+    integer(SHR_KIND_IN), intent(in) :: date            ! coded (yyyymmdd) calendar date
+    integer(SHR_KIND_IN), intent(out) :: eday            ! number of elapsed days
 
 !EOP
 
-   !--- local ---
-   integer(SHR_KIND_IN) :: year,month,day
+    !--- local ---
+    integer(SHR_KIND_IN) :: year, month, day
 
 !-------------------------------------------------------------------------------
 ! NOTE:
 !   elapsed days since yy-mm-dd = 00-01-01, with 0 elapsed seconds
 !-------------------------------------------------------------------------------
 
-   if (.not. shr_cal_validDate(date)) stop 
+    if (.not. shr_cal_validDate(date)) stop
 
-   year =int(     date       /10000)
-   month=int( mod(date,10000)/  100)
-   day  =     mod(date,  100) 
+    year = int(date/10000)
+    month = int(mod(date, 10000)/100)
+    day = mod(date, 100)
 
-   eday = year*365 + dsm(month) + (day-1)
+    eday = year*365 + dsm(month) + (day - 1)
 
-end subroutine shr_cal_date2eday
+  end subroutine shr_cal_date2eday
 
 !===============================================================================
 !BOP ===========================================================================
@@ -351,29 +350,29 @@ end subroutine shr_cal_date2eday
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-subroutine shr_cal_ymd2date(year,month,day,date)
+  subroutine shr_cal_ymd2date(year, month, day, date)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in ) :: year,month,day  ! calendar year,month,day
-   integer(SHR_KIND_IN),intent(out) :: date            ! coded (yyyymmdd) calendar date
+    integer(SHR_KIND_IN), intent(in) :: year, month, day  ! calendar year,month,day
+    integer(SHR_KIND_IN), intent(out) :: date            ! coded (yyyymmdd) calendar date
 
 !EOP
 
-   !--- local ---
+    !--- local ---
 
 !-------------------------------------------------------------------------------
 ! NOTE:
 !   this calendar has a year zero (but no day or month zero)
 !-------------------------------------------------------------------------------
 
-   if (.not. shr_cal_validYMD(year,month,day)) stop 
+    if (.not. shr_cal_validYMD(year, month, day)) stop
 
-   date = year*10000 + month*100 + day  ! coded calendar date
+    date = year*10000 + month*100 + day  ! coded calendar date
 
-end subroutine shr_cal_ymd2date
+  end subroutine shr_cal_ymd2date
 
 !===============================================================================
 !BOP ===========================================================================
@@ -388,29 +387,29 @@ end subroutine shr_cal_ymd2date
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-subroutine  shr_cal_ymd2eday(year,month,day,eday)
+  subroutine shr_cal_ymd2eday(year, month, day, eday)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in ) :: year,month,day  ! calendar year,month,day
-   integer(SHR_KIND_IN),intent(out) :: eday            ! number of elapsed days
+    integer(SHR_KIND_IN), intent(in) :: year, month, day  ! calendar year,month,day
+    integer(SHR_KIND_IN), intent(out) :: eday            ! number of elapsed days
 
 !EOP
 
-   !--- local ---
+    !--- local ---
 
 !-------------------------------------------------------------------------------
 ! NOTE:
 !   elapsed days since yy-mm-dd = 00-01-01, with 0 elapsed seconds
 !-------------------------------------------------------------------------------
 
-   if (.not. shr_cal_validYMD(year,month,day)) stop 
+    if (.not. shr_cal_validYMD(year, month, day)) stop
 
-   eday = year*365 + dsm(month) + (day-1)
+    eday = year*365 + dsm(month) + (day - 1)
 
-end subroutine  shr_cal_ymd2eday
+  end subroutine shr_cal_ymd2eday
 
 !===============================================================================
 !BOP ===========================================================================
@@ -422,85 +421,85 @@ end subroutine  shr_cal_ymd2eday
 !
 ! !REVISION HISTORY:
 !     2005-Jun-10 - B. Kauffman - bug fix, simplified algorithm
-!     2005-May-15 - T. Craig - initial version 
+!     2005-May-15 - T. Craig - initial version
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-subroutine shr_cal_advDate(delta,units,dateIN,secIN,dateOUT,secOUT,calendar)
+  subroutine shr_cal_advDate(delta, units, dateIN, secIN, dateOUT, secOUT, calendar)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   real   (SHR_KIND_R8) ,intent(in)  :: delta     ! time increment
-   character(*)         ,intent(in)  :: units     ! units of increment
-   integer(SHR_KIND_IN) ,intent(in)  :: dateIN    ! base date, yyyymmdd
-   real   (SHR_KIND_R8) ,intent(in)  :: secIN     ! base seconds
-   integer(SHR_KIND_IN) ,intent(out) :: dateOUT   ! new date, yyyymmdd
-   real   (SHR_KIND_R8) ,intent(out) :: secOUT    ! new seconds
-   character(*),optional,intent(in)  :: calendar  ! calendar type
+    real(SHR_KIND_R8), intent(in)  :: delta     ! time increment
+    character(*), intent(in)  :: units     ! units of increment
+    integer(SHR_KIND_IN), intent(in)  :: dateIN    ! base date, yyyymmdd
+    real(SHR_KIND_R8), intent(in)  :: secIN     ! base seconds
+    integer(SHR_KIND_IN), intent(out) :: dateOUT   ! new date, yyyymmdd
+    real(SHR_KIND_R8), intent(out) :: secOUT    ! new seconds
+    character(*), optional, intent(in)  :: calendar  ! calendar type
 
 !EOP
 
-   !--- local ---
-   real   (SHR_KIND_R8)   :: dSec    ! delta-sec: advance date this many seconds
-   integer(SHR_KIND_IN)   :: dDay    ! advance this many whole days
-   real   (SHR_KIND_R8)   :: rSec    ! advance this many "remainder seconds"
-   integer(SHR_KIND_IN)   :: eDay    ! date as elapsed dates from ref date
-   character(SHR_KIND_CL) :: calOrig ! original calendar type
+    !--- local ---
+    real(SHR_KIND_R8)   :: dSec    ! delta-sec: advance date this many seconds
+    integer(SHR_KIND_IN)   :: dDay    ! advance this many whole days
+    real(SHR_KIND_R8)   :: rSec    ! advance this many "remainder seconds"
+    integer(SHR_KIND_IN)   :: eDay    ! date as elapsed dates from ref date
+    character(SHR_KIND_CL) :: calOrig ! original calendar type
 
-   !--- formats ---
-   character(*),parameter :: subName = "(shr_cal_advDate)"
-   character(*),parameter :: F00 = "('(shr_cal_advDate) ',a,i5)"
-   character(*),parameter :: F02 = "('(shr_cal_advDate) ',a,i8.8,f10.3)"
-   
+    !--- formats ---
+    character(*), parameter :: subName = "(shr_cal_advDate)"
+    character(*), parameter :: F00 = "('(shr_cal_advDate) ',a,i5)"
+    character(*), parameter :: F02 = "('(shr_cal_advDate) ',a,i8.8,f10.3)"
+
 !-------------------------------------------------------------------------------
 ! NOTE:
 !-------------------------------------------------------------------------------
 
-   call shr_cal_get(calOrig)
+    call shr_cal_get(calOrig)
 
-   !--- allow the temporary use of an alternate calendar ---
-   if (present(calendar)) call shr_cal_set(calendar)
+    !--- allow the temporary use of an alternate calendar ---
+    if (present(calendar)) call shr_cal_set(calendar)
 
-   !--- calculate delta-time in seconds ---
-   if     (trim(units) == 'days'   ) then
-      dSec = delta * SHR_CONST_CDAY
-   elseif (trim(units) == 'hours'  ) then
-      dSec = delta * 3600.0_SHR_KIND_R8
-   elseif (trim(units) == 'minutes') then
-      dSec = delta *   60.0_SHR_KIND_R8
-   elseif (trim(units) == 'seconds') then
-      dSec = delta *    1.0_SHR_KIND_R8
-   else
+    !--- calculate delta-time in seconds ---
+    if (trim(units) == 'days') then
+      dSec = delta*SHR_CONST_CDAY
+    elseif (trim(units) == 'hours') then
+      dSec = delta*3600.0_SHR_KIND_R8
+    elseif (trim(units) == 'minutes') then
+      dSec = delta*60.0_SHR_KIND_R8
+    elseif (trim(units) == 'seconds') then
+      dSec = delta*1.0_SHR_KIND_R8
+    else
       call shr_sys_abort(' ERROR: unrecognized time units '//trim(units))
-   endif
+    end if
 
-   !--- starting from dateIN and zero seconds...      ---
-   !--- advance (secIN + dSec) seconds to arrive at output date ---
+    !--- starting from dateIN and zero seconds...      ---
+    !--- advance (secIN + dSec) seconds to arrive at output date ---
 
-   call shr_cal_date2eday(dateIN,eDay) ! starting from this eDay...
-   dSec = dSec + secIN                 ! advance this many seconds
+    call shr_cal_date2eday(dateIN, eDay) ! starting from this eDay...
+    dSec = dSec + secIN                 ! advance this many seconds
 
-   dDay = int(dSec/SHR_CONST_CDAY)     ! advance this many whole days...
-   rSec = mod(dSec,SHR_CONST_CDAY)     ! ...plus this many secs (less than a day)
+    dDay = int(dSec/SHR_CONST_CDAY)     ! advance this many whole days...
+    rSec = mod(dSec, SHR_CONST_CDAY)     ! ...plus this many secs (less than a day)
 
-   call shr_cal_eday2date(eDay+dDay,dateOUT)
-   secOUT = rSec    
+    call shr_cal_eday2date(eDay + dDay, dateOUT)
+    secOUT = rSec
 
-   if (debug>0) then
+    if (debug > 0) then
       if (present(calendar)) then
-	 write(6,*) subName," units,delta,calendar=",trim(units),' ',trim(calendar),delta
+        write (6, *) subName, " units,delta,calendar=", trim(units), ' ', trim(calendar), delta
       else
-	 write(6,*) subName," units,delta=",trim(units),delta
-      endif
-      write(6,F02) "dateIN ,secIN =",dateIN ,secIN
-      write(6,F02) "dateOUT,secOUT=",dateOUT,secOUT
-   end if
+        write (6, *) subName, " units,delta=", trim(units), delta
+      end if
+      write (6, F02) "dateIN ,secIN =", dateIN, secIN
+      write (6, F02) "dateOUT,secOUT=", dateOUT, secOUT
+    end if
 
-   call shr_cal_set(calOrig)
+    call shr_cal_set(calOrig)
 
-end subroutine shr_cal_advDate
+  end subroutine shr_cal_advDate
 
 !===============================================================================
 !BOP ===========================================================================
@@ -515,38 +514,38 @@ end subroutine shr_cal_advDate
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-logical function shr_cal_validDate(date) 
+  logical function shr_cal_validDate(date)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in ) :: date            ! coded (yyyymmdd) calendar date
+    integer(SHR_KIND_IN), intent(in) :: date            ! coded (yyyymmdd) calendar date
 
 !EOP
 
-   !--- local ---
-   integer(SHR_KIND_IN) :: year,month,day
+    !--- local ---
+    integer(SHR_KIND_IN) :: year, month, day
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   year =int(     date       /10000)
-   month=int( mod(date,10000)/  100)
-   day  =     mod(date,  100) 
+    year = int(date/10000)
+    month = int(mod(date, 10000)/100)
+    day = mod(date, 100)
 
-   shr_cal_validDate = .true.
-   if (year  <    0) shr_cal_validDate = .false.
-   if (year  > 9999) shr_cal_validDate = .false.
-   if (month <    1) shr_cal_validDate = .false.
-   if (month >   12) shr_cal_validDate = .false.
-   if (day   <    1) shr_cal_validDate = .false.
-   if (shr_cal_validDate) then
+    shr_cal_validDate = .true.
+    if (year < 0) shr_cal_validDate = .false.
+    if (year > 9999) shr_cal_validDate = .false.
+    if (month < 1) shr_cal_validDate = .false.
+    if (month > 12) shr_cal_validDate = .false.
+    if (day < 1) shr_cal_validDate = .false.
+    if (shr_cal_validDate) then
       if (day > dpm(month)) shr_cal_validDate = .false.
-   endif
+    end if
 
-end function shr_cal_validDate
+  end function shr_cal_validDate
 
 !===============================================================================
 !BOP ===========================================================================
@@ -561,33 +560,33 @@ end function shr_cal_validDate
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-logical function shr_cal_validYMD(year,month,day)
+  logical function shr_cal_validYMD(year, month, day)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in ) :: year,month,day  ! calendar year,month,day
+    integer(SHR_KIND_IN), intent(in) :: year, month, day  ! calendar year,month,day
 
 !EOP
 
-   !--- local ---
+    !--- local ---
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   shr_cal_validYMD = .true.
-   if (year  <    0) shr_cal_validYMD = .false.
-   if (year  > 9999) shr_cal_validYMD = .false.
-   if (month <    1) shr_cal_validYMD = .false.
-   if (month >   12) shr_cal_validYMD = .false.
-   if (day   <    1) shr_cal_validYMD = .false.
-   if (shr_cal_validYMD) then
+    shr_cal_validYMD = .true.
+    if (year < 0) shr_cal_validYMD = .false.
+    if (year > 9999) shr_cal_validYMD = .false.
+    if (month < 1) shr_cal_validYMD = .false.
+    if (month > 12) shr_cal_validYMD = .false.
+    if (day < 1) shr_cal_validYMD = .false.
+    if (shr_cal_validYMD) then
       if (day > dpm(month)) shr_cal_validYMD = .false.
-   endif
+    end if
 
-end function shr_cal_validYMD
+  end function shr_cal_validYMD
 
 !===============================================================================
 !BOP ===========================================================================
@@ -602,31 +601,31 @@ end function shr_cal_validYMD
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-logical function shr_cal_validHMS(hr,min,sec)
+  logical function shr_cal_validHMS(hr, min, sec)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in ) :: hr, min, sec   ! hour, minute, second
+    integer(SHR_KIND_IN), intent(in) :: hr, min, sec   ! hour, minute, second
 
 !EOP
 
-   !--- local ---
+    !--- local ---
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-   shr_cal_validHMS = .true.
-   if (hr  <    0) shr_cal_validHMS = .false.
-   if (hr  >   23) shr_cal_validHMS = .false.
-   if (min <    0) shr_cal_validHMS = .false.
-   if (min >   59) shr_cal_validHMS = .false.
-   if (sec <    0) shr_cal_validHMS = .false.
-   if (sec >   60) shr_cal_validHMS = .false.
+    shr_cal_validHMS = .true.
+    if (hr < 0) shr_cal_validHMS = .false.
+    if (hr > 23) shr_cal_validHMS = .false.
+    if (min < 0) shr_cal_validHMS = .false.
+    if (min > 59) shr_cal_validHMS = .false.
+    if (sec < 0) shr_cal_validHMS = .false.
+    if (sec > 60) shr_cal_validHMS = .false.
 
-end function shr_cal_validHMS
+  end function shr_cal_validHMS
 
 !===============================================================================
 !BOP ===========================================================================
@@ -641,13 +640,13 @@ end function shr_cal_validHMS
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-integer function shr_cal_numDaysInMonth(year,month)
+  integer function shr_cal_numDaysInMonth(year, month)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in ) :: year,month  ! calendar year,month
+    integer(SHR_KIND_IN), intent(in) :: year, month  ! calendar year,month
 
 !EOP
 
@@ -655,9 +654,9 @@ integer function shr_cal_numDaysInMonth(year,month)
 !
 !-------------------------------------------------------------------------------
 
-   shr_cal_numDaysInMonth = dpm(month)
+    shr_cal_numDaysInMonth = dpm(month)
 
-end function shr_cal_numDaysInMonth
+  end function shr_cal_numDaysInMonth
 
 !===============================================================================
 !BOP ===========================================================================
@@ -673,13 +672,13 @@ end function shr_cal_numDaysInMonth
 !
 ! !INTERFACE:  -----------------------------------------------------------------
 
-integer function shr_cal_elapsDaysStrtMonth(year,month)
+  integer function shr_cal_elapsDaysStrtMonth(year, month)
 
-   implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in ) :: year,month  ! calendar year,month
+    integer(SHR_KIND_IN), intent(in) :: year, month  ! calendar year,month
 
 !EOP
 
@@ -687,9 +686,9 @@ integer function shr_cal_elapsDaysStrtMonth(year,month)
 !
 !-------------------------------------------------------------------------------
 
-   shr_cal_elapsDaysStrtMonth = dsm(month)
+    shr_cal_elapsDaysStrtMonth = dsm(month)
 
-end function shr_cal_elapsDaysStrtMonth
+  end function shr_cal_elapsDaysStrtMonth
 
 !===============================================================================
 !BOP ===========================================================================
@@ -706,29 +705,29 @@ end function shr_cal_elapsDaysStrtMonth
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_cal_setDebug(level)
+  subroutine shr_cal_setDebug(level)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  integer,intent(in) :: level
+    integer, intent(in) :: level
 
 !EOP
 
-  !--- formats ---
-  character(*),parameter :: subName =   "(shr_cal_setDebug) "
-  character(*),parameter :: F00     = "('(shr_cal_setDebug) ',a) "
-  character(*),parameter :: F01     = "('(shr_cal_setDebug) ',a,i4) "
+    !--- formats ---
+    character(*), parameter :: subName = "(shr_cal_setDebug) "
+    character(*), parameter :: F00 = "('(shr_cal_setDebug) ',a) "
+    character(*), parameter :: F01 = "('(shr_cal_setDebug) ',a,i4) "
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-  debug = level
-  write(6,F01) "debug level reset to ",level
+    debug = level
+    write (6, F01) "debug level reset to ", level
 
-end subroutine shr_cal_setDebug
+  end subroutine shr_cal_setDebug
 
 !===============================================================================
 !BOP ===========================================================================
@@ -745,27 +744,27 @@ end subroutine shr_cal_setDebug
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_cal_getDebug(level)
+  subroutine shr_cal_getDebug(level)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  integer,intent(out) :: level
+    integer, intent(out) :: level
 
 !EOP
 
-  !--- formats ---
-  character(*),parameter :: subName =   "(shr_cal_getDebug) "
-  character(*),parameter :: F00     = "('(shr_cal_getDebug) ',a) "
+    !--- formats ---
+    character(*), parameter :: subName = "(shr_cal_getDebug) "
+    character(*), parameter :: F00 = "('(shr_cal_getDebug) ',a) "
 
 !-------------------------------------------------------------------------------
 !
 !-------------------------------------------------------------------------------
 
-  level = debug
+    level = debug
 
-end subroutine shr_cal_getDebug
+  end subroutine shr_cal_getDebug
 
 !===============================================================================
 !===============================================================================

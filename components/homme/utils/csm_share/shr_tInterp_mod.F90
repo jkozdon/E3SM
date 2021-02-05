@@ -16,40 +16,40 @@
 ! !INTERFACE: ------------------------------------------------------------------
 
 module shr_tInterp_mod
- 
+
 ! !USES:
 
-   use shr_sys_mod   ! shared system calls
-   use shr_cal_mod   ! shared calendar type and methods
-   use shr_kind_mod  ! kinds for strong typing
-   use shr_const_mod ! shared constants
+  use shr_sys_mod   ! shared system calls
+  use shr_cal_mod   ! shared calendar type and methods
+  use shr_kind_mod  ! kinds for strong typing
+  use shr_const_mod ! shared constants
 
-   implicit none
+  implicit none
 
-   private ! except
+  private ! except
 
 ! !PUBLIC TYPES:
 
-   ! no public types
+  ! no public types
 
 ! !PUBLIC MEMBER FUNCTIONS:
 
-   public :: shr_tInterp_getFactors  ! get time-interp factors
-   public :: shr_tInterp_setAbort    ! set abort on error
-   public :: shr_tInterp_setDebug    ! set debug level
-   public :: shr_tInterp_getDebug    ! get debug level
+  public :: shr_tInterp_getFactors  ! get time-interp factors
+  public :: shr_tInterp_setAbort    ! set abort on error
+  public :: shr_tInterp_setDebug    ! set debug level
+  public :: shr_tInterp_getDebug    ! get debug level
 
 ! !PUBLIC DATA MEMBERS:
 
-   ! no public data
+  ! no public data
 
 !EOP
 
-   real(SHR_KIND_R8),parameter :: c0 = 0.0_SHR_KIND_R8
-   real(SHR_KIND_R8),parameter :: c1 = 1.0_SHR_KIND_R8
-   real(SHR_KIND_R8),parameter :: eps = 1.0E-12_SHR_KIND_R8
-   logical ,save               :: doabort = .true.
-   integer ,save               :: debug = 0
+  real(SHR_KIND_R8), parameter :: c0 = 0.0_SHR_KIND_R8
+  real(SHR_KIND_R8), parameter :: c1 = 1.0_SHR_KIND_R8
+  real(SHR_KIND_R8), parameter :: eps = 1.0E-12_SHR_KIND_R8
+  logical, save               :: doabort = .true.
+  integer, save               :: debug = 0
 
 !===============================================================================
 contains
@@ -78,128 +78,128 @@ contains
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_tInterp_getFactors(D1,S1,D2,S2,Din,Sin,f1,f2,algo,rc)
+  subroutine shr_tInterp_getFactors(D1, S1, D2, S2, Din, Sin, f1, f2, algo, rc)
 
-   implicit none
+    implicit none
 
 ! !USES:
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-   integer(SHR_KIND_IN),intent(in)           :: D1,S1   ! LB date & sec (20010115,3600)
-   integer(SHR_KIND_IN),intent(in)           :: D2,S2   ! UB date & sec
-   integer(SHR_KIND_IN),intent(in)           :: Din,Sin ! desired/model date & sec
-   real(SHR_KIND_R8)   ,intent(out)          :: f1      ! wgt for 1
-   real(SHR_KIND_R8)   ,intent(out)          :: f2      ! wgt for 2
-   character(*)        ,intent(in) ,optional :: algo    ! algorithm
-   integer(SHR_KIND_IN),intent(out),optional :: rc      ! return code
+    integer(SHR_KIND_IN), intent(in)           :: D1, S1   ! LB date & sec (20010115,3600)
+    integer(SHR_KIND_IN), intent(in)           :: D2, S2   ! UB date & sec
+    integer(SHR_KIND_IN), intent(in)           :: Din, Sin ! desired/model date & sec
+    real(SHR_KIND_R8), intent(out)          :: f1      ! wgt for 1
+    real(SHR_KIND_R8), intent(out)          :: f2      ! wgt for 2
+    character(*), intent(in), optional :: algo    ! algorithm
+    integer(SHR_KIND_IN), intent(out), optional :: rc      ! return code
 
 !EOP
 
-   !----- local  ------
-   real(SHR_KIND_R8)      :: etime1      ! elapsed days for 1 (lower-bound)
-   real(SHR_KIND_R8)      :: etime2      ! elapsed days for 2 (upper-bound)
-   real(SHR_KIND_R8)      :: etimeIn     ! elapsed days for model date
-   integer(SHR_KIND_IN)   :: eday        ! elapsed days
-   character(SHR_KIND_CS) :: lalgo       ! local algo variable
-   integer(SHR_KIND_IN)   :: lrc         ! local rc
+    !----- local  ------
+    real(SHR_KIND_R8)      :: etime1      ! elapsed days for 1 (lower-bound)
+    real(SHR_KIND_R8)      :: etime2      ! elapsed days for 2 (upper-bound)
+    real(SHR_KIND_R8)      :: etimeIn     ! elapsed days for model date
+    integer(SHR_KIND_IN)   :: eday        ! elapsed days
+    character(SHR_KIND_CS) :: lalgo       ! local algo variable
+    integer(SHR_KIND_IN)   :: lrc         ! local rc
 
-   !----- formats -----
-   character(*),parameter :: subName = "(shr_tInterp_getFactors)"
-   character(*),parameter :: F00   = "('(shr_tInterp_getFactors) ',8a)" 
-   character(*),parameter :: F01   = "('(shr_tInterp_getFactors) ',a,2f17.8)" 
-   character(*),parameter :: F02   = "('(shr_tInterp_getFactors) ',a,3f17.8)" 
-   character(*),parameter :: F03   = "('(shr_tInterp_getFactors) ',2a,3(i9.8,i6))" 
+    !----- formats -----
+    character(*), parameter :: subName = "(shr_tInterp_getFactors)"
+    character(*), parameter :: F00 = "('(shr_tInterp_getFactors) ',8a)"
+    character(*), parameter :: F01 = "('(shr_tInterp_getFactors) ',a,2f17.8)"
+    character(*), parameter :: F02 = "('(shr_tInterp_getFactors) ',a,3f17.8)"
+    character(*), parameter :: F03 = "('(shr_tInterp_getFactors) ',2a,3(i9.8,i6))"
 
 !-------------------------------------------------------------------------------
 ! Computes time interpolation factors
 !-------------------------------------------------------------------------------
 
-   lrc = 0
+    lrc = 0
 
-   if (present(algo)) then
-     lalgo = algo
-   else
-     lalgo = 'linear'
-   endif
+    if (present(algo)) then
+      lalgo = algo
+    else
+      lalgo = 'linear'
+    end if
 
-   !--- compute elapsed time ---
-   call shr_cal_date2eday(D1, eday)
-   etime1 = real(eday,SHR_KIND_R8) + real(s1,SHR_KIND_R8)/shr_const_cDay
+    !--- compute elapsed time ---
+    call shr_cal_date2eday(D1, eday)
+    etime1 = real(eday, SHR_KIND_R8) + real(s1, SHR_KIND_R8)/shr_const_cDay
 
-   call shr_cal_date2eday(D2, eday)
-   etime2 = real(eday,SHR_KIND_R8) + real(s2,SHR_KIND_R8)/shr_const_cDay
+    call shr_cal_date2eday(D2, eday)
+    etime2 = real(eday, SHR_KIND_R8) + real(s2, SHR_KIND_R8)/shr_const_cDay
 
-   call shr_cal_date2eday(Din, eday)
-   etimein = real(eday,SHR_KIND_R8) + real(sin,SHR_KIND_R8)/shr_const_cDay
+    call shr_cal_date2eday(Din, eday)
+    etimein = real(eday, SHR_KIND_R8) + real(sin, SHR_KIND_R8)/shr_const_cDay
 
-   ! --- always check that 1 <= 2, although we could relax this requirement ---
-   if (etime2 < etime1) then
-     write(6,F01) ' ERROR: etime2 < etime1 ',etime2,etime1
-     lrc = 1
-     call shr_tInterp_abort(subName//' etime2 < etime1 ')
-   endif
+    ! --- always check that 1 <= 2, although we could relax this requirement ---
+    if (etime2 < etime1) then
+      write (6, F01) ' ERROR: etime2 < etime1 ', etime2, etime1
+      lrc = 1
+      call shr_tInterp_abort(subName//' etime2 < etime1 ')
+    end if
 
-   f1 = c0
-   f2 = c0
-   ! --- set interpolation factors ---
-   if (trim(lalgo) == 'lower') then
-     if (etime1 < etime2) then
-       f1 = c1
-     else
-       f2 = c1
-     endif
-   elseif (trim(lalgo) == 'upper') then
-     if (etime1 < etime2) then
-       f2 = c1
-     else
-       f1 = c1
-     endif
-   elseif (trim(lalgo) == 'nearest') then
-     if (abs(etimein-etime1) <= abs(etime2-etimein)) then
-       f1 = c1
-       f2 = c0
-     else
-       f1 = c0
-       f2 = c1
-     endif
-   elseif (trim(lalgo) == 'linear') then
-     !--- check that etimein is between etime1 and etime2 ---
-     if (etime2 < etimein .or. etime1 > etimein) then
-       write(6,F02) ' ERROR illegal linear times: ',etime1,etimein,etime2
-       lrc = 1
-       call shr_tInterp_abort(subName//' illegal algo option '//trim(algo))
-     endif
-     if (etime2 == etime1) then
-       f1 = 0.5_SHR_KIND_R8
-       f2 = 0.5_SHR_KIND_R8
-     else
-       f1 = (etime2-etimein)/(etime2-etime1)
-       f2 = c1 - f1
-     endif
-   else
-     write(6,F00) 'ERROR: illegal lalgo option: ',trim(lalgo)
-     lrc = 1
-     call shr_tInterp_abort(subName//' illegal algo option '//trim(lalgo))
-   endif
+    f1 = c0
+    f2 = c0
+    ! --- set interpolation factors ---
+    if (trim(lalgo) == 'lower') then
+      if (etime1 < etime2) then
+        f1 = c1
+      else
+        f2 = c1
+      end if
+    elseif (trim(lalgo) == 'upper') then
+      if (etime1 < etime2) then
+        f2 = c1
+      else
+        f1 = c1
+      end if
+    elseif (trim(lalgo) == 'nearest') then
+      if (abs(etimein - etime1) <= abs(etime2 - etimein)) then
+        f1 = c1
+        f2 = c0
+      else
+        f1 = c0
+        f2 = c1
+      end if
+    elseif (trim(lalgo) == 'linear') then
+      !--- check that etimein is between etime1 and etime2 ---
+      if (etime2 < etimein .or. etime1 > etimein) then
+        write (6, F02) ' ERROR illegal linear times: ', etime1, etimein, etime2
+        lrc = 1
+        call shr_tInterp_abort(subName//' illegal algo option '//trim(algo))
+      end if
+      if (etime2 == etime1) then
+        f1 = 0.5_SHR_KIND_R8
+        f2 = 0.5_SHR_KIND_R8
+      else
+        f1 = (etime2 - etimein)/(etime2 - etime1)
+        f2 = c1 - f1
+      end if
+    else
+      write (6, F00) 'ERROR: illegal lalgo option: ', trim(lalgo)
+      lrc = 1
+      call shr_tInterp_abort(subName//' illegal algo option '//trim(lalgo))
+    end if
 
-   !--- check that f1 and f2 are OK, each between 0 and 1 and they sum to 1 ---
-   if (f1 < c0-eps .or. f1 > c1+eps .or. &
-       f2 < c0-eps .or. f2 > c1+eps .or. &
-       abs(f1+f2-c1) > eps) then
-     write(6,F01) 'ERROR: illegal tInterp values ',f1,f2
-     lrc = 1
-     call shr_tInterp_abort(subName//' illegal tInterp values ')
-   endif
+    !--- check that f1 and f2 are OK, each between 0 and 1 and they sum to 1 ---
+    if (f1 < c0 - eps .or. f1 > c1 + eps .or. &
+        f2 < c0 - eps .or. f2 > c1 + eps .or. &
+        abs(f1 + f2 - c1) > eps) then
+      write (6, F01) 'ERROR: illegal tInterp values ', f1, f2
+      lrc = 1
+      call shr_tInterp_abort(subName//' illegal tInterp values ')
+    end if
 
-   if (debug > 0) then
-     write(6,F03) 'DEBUG: algo,D1,S1,Din,Sin,D2,S2=',trim(lAlgo),D1,S1,Din,Sin,D2,S2
-     write(6,F01) 'DEBUG: algo,f1,f2= '//trim(lAlgo),f1,f2
-   endif
+    if (debug > 0) then
+      write (6, F03) 'DEBUG: algo,D1,S1,Din,Sin,D2,S2=', trim(lAlgo), D1, S1, Din, Sin, D2, S2
+      write (6, F01) 'DEBUG: algo,f1,f2= '//trim(lAlgo), f1, f2
+    end if
 
-   if (present(rc)) rc = lrc
+    if (present(rc)) rc = lrc
 
-end subroutine shr_tInterp_getFactors
+  end subroutine shr_tInterp_getFactors
 
 !===============================================================================
 !BOP ===========================================================================
@@ -216,25 +216,25 @@ end subroutine shr_tInterp_getFactors
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_tInterp_setAbort(flag)
+  subroutine shr_tInterp_setAbort(flag)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  logical,intent(in) :: flag
+    logical, intent(in) :: flag
 
 !EOP
 
-  !--- formats ---
-  character(*),parameter :: subName =   "(shr_tInterp_setAbort) "
-  character(*),parameter :: F00     = "('(shr_tInterp_setAbort) ',a) "
+    !--- formats ---
+    character(*), parameter :: subName = "(shr_tInterp_setAbort) "
+    character(*), parameter :: F00 = "('(shr_tInterp_setAbort) ',a) "
 
 !-------------------------------------------------------------------------------
 
-  doabort = flag
+    doabort = flag
 
-end subroutine shr_tInterp_setAbort
+  end subroutine shr_tInterp_setAbort
 
 !===============================================================================
 !XXBOP ===========================================================================
@@ -251,33 +251,33 @@ end subroutine shr_tInterp_setAbort
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_tInterp_abort(string)
+  subroutine shr_tInterp_abort(string)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  character(*),optional,intent(in) :: string
+    character(*), optional, intent(in) :: string
 
 !XXEOP
 
-  !--- formats ---
-  character(SHR_KIND_CL) :: lstring
-  character(*),parameter :: subName =   "(shr_tInterp_abort) "
-  character(*),parameter :: F00     = "('(shr_tInterp_abort) ',a) "
+    !--- formats ---
+    character(SHR_KIND_CL) :: lstring
+    character(*), parameter :: subName = "(shr_tInterp_abort) "
+    character(*), parameter :: F00 = "('(shr_tInterp_abort) ',a) "
 
 !-------------------------------------------------------------------------------
 
-  lstring = ''
-  if (present(string)) lstring = string
+    lstring = ''
+    if (present(string)) lstring = string
 
-  if (doabort) then
-    call shr_sys_abort(lstring)
-  else
-    write(6,F00) trim(lstring)
-  endif
+    if (doabort) then
+      call shr_sys_abort(lstring)
+    else
+      write (6, F00) trim(lstring)
+    end if
 
-end subroutine shr_tInterp_abort
+  end subroutine shr_tInterp_abort
 
 !===============================================================================
 !BOP ===========================================================================
@@ -294,25 +294,25 @@ end subroutine shr_tInterp_abort
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_tInterp_getDebug(level)
+  subroutine shr_tInterp_getDebug(level)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  integer,intent(out) :: level
+    integer, intent(out) :: level
 
 !EOP
 
-  !--- formats ---
-  character(*),parameter :: subName =   "(shr_tInterp_getDebug) "
-  character(*),parameter :: F00     = "('(shr_tInterp_getDebug) ',a) "
+    !--- formats ---
+    character(*), parameter :: subName = "(shr_tInterp_getDebug) "
+    character(*), parameter :: F00 = "('(shr_tInterp_getDebug) ',a) "
 
 !-------------------------------------------------------------------------------
 
-  level = debug
+    level = debug
 
-end subroutine shr_tInterp_getDebug
+  end subroutine shr_tInterp_getDebug
 
 !===============================================================================
 !BOP ===========================================================================
@@ -329,26 +329,26 @@ end subroutine shr_tInterp_getDebug
 !
 ! !INTERFACE: ------------------------------------------------------------------
 
-subroutine shr_tInterp_setDebug(iflag)
+  subroutine shr_tInterp_setDebug(iflag)
 
-  implicit none
+    implicit none
 
 ! !INPUT/OUTPUT PARAMETERS:
 
-  integer,intent(in) :: iflag
+    integer, intent(in) :: iflag
 
 !EOP
 
-  !--- formats ---
-  character(*),parameter :: subName =   "(shr_tInterp_setDebug) "
-  character(*),parameter :: F01     = "('(shr_tInterp_setDebug) ',a,i3) "
+    !--- formats ---
+    character(*), parameter :: subName = "(shr_tInterp_setDebug) "
+    character(*), parameter :: F01 = "('(shr_tInterp_setDebug) ',a,i3) "
 
 !-------------------------------------------------------------------------------
 
-  debug = iflag
-  if (debug>0) write(6,F01) "DEBUG: level changed to ",debug
+    debug = iflag
+    if (debug > 0) write (6, F01) "DEBUG: level changed to ", debug
 
-end subroutine shr_tInterp_setDebug
+  end subroutine shr_tInterp_setDebug
 
 !===============================================================================
 !===============================================================================

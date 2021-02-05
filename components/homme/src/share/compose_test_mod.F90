@@ -6,66 +6,66 @@ module compose_test_mod
 
   implicit none
 
-interface
+  interface
 
 #ifdef HOMME_ENABLE_COMPOSE
-   subroutine compose_unittest() bind(c)
-   end subroutine compose_unittest
+    subroutine compose_unittest() bind(c)
+    end subroutine compose_unittest
 
-   subroutine compose_stt_init(np, nlev, qsize, qsize_d, nelemd) bind(c)
-     use iso_c_binding, only: c_int
-     integer (kind=c_int), value, intent(in) :: np, nlev, qsize, qsize_d, nelemd
-   end subroutine compose_stt_init
+    subroutine compose_stt_init(np, nlev, qsize, qsize_d, nelemd) bind(c)
+      use iso_c_binding, only: c_int
+      integer(kind=c_int), value, intent(in) :: np, nlev, qsize, qsize_d, nelemd
+    end subroutine compose_stt_init
 
-   subroutine compose_stt_fill_uniform_density(ie, np1, dp3d, dp) bind(c)
-     use iso_c_binding, only: c_int, c_double
-     use dimensions_mod, only: nlev, np
-     use element_state, only: timelevels
-     integer (kind=c_int), value, intent(in) :: ie, np1
-     real (kind=c_double), intent(in) :: dp3d(np,np,nlev,timelevels), &
-          dp(np,np,nlev)
-   end subroutine compose_stt_fill_uniform_density
+    subroutine compose_stt_fill_uniform_density(ie, np1, dp3d, dp) bind(c)
+      use iso_c_binding, only: c_int, c_double
+      use dimensions_mod, only: nlev, np
+      use element_state, only: timelevels
+      integer(kind=c_int), value, intent(in) :: ie, np1
+      real(kind=c_double), intent(in) :: dp3d(np, np, nlev, timelevels), &
+                                         dp(np, np, nlev)
+    end subroutine compose_stt_fill_uniform_density
 
-   subroutine compose_stt_fill_ics(ie, p_elem, dp, n0_qdp, qdp) bind(c)
-     use iso_c_binding, only: c_int, c_double
-     use dimensions_mod, only: nlev, np, qsize_d
-     use coordinate_systems_mod, only: spherical_polar_t
-     integer (kind=c_int), value, intent(in) :: ie, n0_qdp
-     type(spherical_polar_t), intent(in) :: p_elem(np,np)
-     real (kind=c_double), intent(in) :: dp(np,np,nlev), &
-          qdp(np,np,nlev,qsize_d,2)
-   end subroutine compose_stt_fill_ics
+    subroutine compose_stt_fill_ics(ie, p_elem, dp, n0_qdp, qdp) bind(c)
+      use iso_c_binding, only: c_int, c_double
+      use dimensions_mod, only: nlev, np, qsize_d
+      use coordinate_systems_mod, only: spherical_polar_t
+      integer(kind=c_int), value, intent(in) :: ie, n0_qdp
+      type(spherical_polar_t), intent(in) :: p_elem(np, np)
+      real(kind=c_double), intent(in) :: dp(np, np, nlev), &
+                                         qdp(np, np, nlev, qsize_d, 2)
+    end subroutine compose_stt_fill_ics
 
-   subroutine compose_stt_fill_v(ie, p_elem, t, v) bind(c)
-     use iso_c_binding, only: c_int, c_double
-     use dimensions_mod, only: nlev, np
-     use coordinate_systems_mod, only: spherical_polar_t
-     integer (kind=c_int), value, intent(in) :: ie
-     type(spherical_polar_t), intent(in) :: p_elem(np,np)
-     real (kind=c_double), intent(in) :: t, v(np,np,2,nlev)
-   end subroutine compose_stt_fill_v
+    subroutine compose_stt_fill_v(ie, p_elem, t, v) bind(c)
+      use iso_c_binding, only: c_int, c_double
+      use dimensions_mod, only: nlev, np
+      use coordinate_systems_mod, only: spherical_polar_t
+      integer(kind=c_int), value, intent(in) :: ie
+      type(spherical_polar_t), intent(in) :: p_elem(np, np)
+      real(kind=c_double), intent(in) :: t, v(np, np, 2, nlev)
+    end subroutine compose_stt_fill_v
 
-   subroutine compose_stt_begin_record() bind(c)
-   end subroutine compose_stt_begin_record
+    subroutine compose_stt_begin_record() bind(c)
+    end subroutine compose_stt_begin_record
 
-   subroutine compose_stt_record_q(ie, p_elem, spheremp, np1, dp3d, n0_qdp, qdp) bind(c)
-     use iso_c_binding, only: c_int, c_double
-     use dimensions_mod, only: nlev, np, qsize_d
-     use element_state, only: timelevels
-     use coordinate_systems_mod, only: spherical_polar_t
-     integer (kind=c_int), value, intent(in) :: ie, np1, n0_qdp
-     type(spherical_polar_t), intent(in) :: p_elem(np,np)
-     real (kind=c_double), intent(in) :: spheremp(np,np), &
-          dp3d(np,np,nlev,timelevels), qdp(np,np,nlev,qsize_d,2)
-   end subroutine compose_stt_record_q
+    subroutine compose_stt_record_q(ie, p_elem, spheremp, np1, dp3d, n0_qdp, qdp) bind(c)
+      use iso_c_binding, only: c_int, c_double
+      use dimensions_mod, only: nlev, np, qsize_d
+      use element_state, only: timelevels
+      use coordinate_systems_mod, only: spherical_polar_t
+      integer(kind=c_int), value, intent(in) :: ie, np1, n0_qdp
+      type(spherical_polar_t), intent(in) :: p_elem(np, np)
+      real(kind=c_double), intent(in) :: spheremp(np, np), &
+                                         dp3d(np, np, nlev, timelevels), qdp(np, np, nlev, qsize_d, 2)
+    end subroutine compose_stt_record_q
 
-   subroutine compose_stt_finish(comm, root, rank) bind(c)
-     use iso_c_binding, only: c_int
-     integer (kind=c_int), value, intent(in) :: comm, root, rank
-   end subroutine compose_stt_finish
+    subroutine compose_stt_finish(comm, root, rank) bind(c)
+      use iso_c_binding, only: c_int
+      integer(kind=c_int), value, intent(in) :: comm, root, rank
+    end subroutine compose_stt_finish
 #endif
 
-end interface
+  end interface
 
 contains
 
@@ -85,20 +85,20 @@ contains
     use compose_mod, only: cedr_unittest
 #endif
 
-    type (parallel_t), intent(in) :: par
-    type (domain1d_t), pointer, intent(in) :: dom_mt(:)
-    type (element_t), intent(inout) :: elem(:)
-    type (hvcoord_t) , intent(in) :: hvcoord
+    type(parallel_t), intent(in) :: par
+    type(domain1d_t), pointer, intent(in) :: dom_mt(:)
+    type(element_t), intent(inout) :: elem(:)
+    type(hvcoord_t), intent(in) :: hvcoord
 
-    type (hybrid_t) :: hybrid
-    type (derivative_t) :: deriv
+    type(hybrid_t) :: hybrid
+    type(derivative_t) :: deriv
     integer :: ithr, nets, nete, nerr
 
 #ifdef HOMME_ENABLE_COMPOSE
     if (transport_alg == 19) then
-       nEndStep = -1
+      nEndStep = -1
     else
-       return
+      return
     end if
 
     call derivinit(deriv)
@@ -149,15 +149,15 @@ contains
     rss_min = parallelmin(rss, hybrid)
     rss_max = parallelmax(rss, hybrid)
     do ie = nets, nete
-       global_shared_buf(ie,1) = 0
+      global_shared_buf(ie, 1) = 0
     end do
     if (nets == 1) then
-       global_shared_buf(1,1) = rss
+      global_shared_buf(1, 1) = rss
     end if
     call wrap_repro_sum(nvars=1, comm=hybrid%par%comm)
-    rss_mean = global_shared_sum(1) / hybrid%par%nprocs
+    rss_mean = global_shared_sum(1)/hybrid%par%nprocs
     if (hybrid%par%masterproc) then
-       write(iulog,'(a10,3(f14.2))') "rss   = ", rss_min, rss_max, rss_mean
+      write (iulog, '(a10,3(f14.2))') "rss   = ", rss_min, rss_max, rss_mean
     end if
   end subroutine print_software_statistics
 
@@ -181,36 +181,36 @@ contains
     use gllfvremap_mod
     use gllfvremap_util_mod
 
-    type (hybrid_t), intent(in) :: hybrid
-    type (domain1d_t), pointer, intent(in) :: dom_mt(:)
-    type (derivative_t), intent(in) :: deriv
-    type (element_t), intent(inout) :: elem(:)
-    type (hvcoord_t) , intent(in) :: hvcoord
+    type(hybrid_t), intent(in) :: hybrid
+    type(domain1d_t), pointer, intent(in) :: dom_mt(:)
+    type(derivative_t), intent(in) :: deriv
+    type(element_t), intent(inout) :: elem(:)
+    type(hvcoord_t), intent(in) :: hvcoord
     integer, intent(in) :: nets, nete
 
-    real (kind=real_kind), parameter :: twelve_days = 3600.d0 * 24 * 12
+    real(kind=real_kind), parameter :: twelve_days = 3600.d0*24*12
 
-    type (timelevel_t) :: tl
+    type(timelevel_t) :: tl
     integer :: nsteps, n0_qdp, np1_qdp, ie, i, j
-    real (kind=real_kind) :: dt, tprev, t
+    real(kind=real_kind) :: dt, tprev, t
 
     if (se_fv_phys_remap_alg == -1) then
-       call gfr_test(hybrid, dom_mt, hvcoord, deriv, elem)
-       call gfr_check_api(hybrid, nets, nete, hvcoord, elem)
-       return
+      call gfr_test(hybrid, dom_mt, hvcoord, deriv, elem)
+      call gfr_check_api(hybrid, nets, nete, hvcoord, elem)
+      return
     end if
 
-#ifdef HOMME_ENABLE_COMPOSE  
+#ifdef HOMME_ENABLE_COMPOSE
     call t_startf('compose_stt')
     ! Set up time stepping and initialize q and density.
     call timelevel_init_default(tl)
     call timelevel_qdp(tl, qsplit, np1_qdp, n0_qdp)
     call compose_stt_init(np, nlev, qsize, qsize_d, nelemd)
     do ie = nets, nete
-       call compose_stt_fill_uniform_density(ie, tl%np1, elem(ie)%state%dp3d, &
-            elem(ie)%derived%dp)
-       call compose_stt_fill_ics(ie, elem(ie)%spherep, elem(ie)%derived%dp, &
-            n0_qdp, elem(ie)%state%qdp)
+      call compose_stt_fill_uniform_density(ie, tl%np1, elem(ie)%state%dp3d, &
+                                            elem(ie)%derived%dp)
+      call compose_stt_fill_ics(ie, elem(ie)%spherep, elem(ie)%derived%dp, &
+                                n0_qdp, elem(ie)%state%qdp)
     end do
     ! Time step.
     !   For now, support only the nondivergent flow field. Supporting the
@@ -220,32 +220,32 @@ contains
     !   nsteps = nint(6*ne*(15.d0/qsplit))
     nsteps = nmax
     if (hybrid%par%masterproc .and. hybrid%masterthread) then
-       print *, 'COMPOSE> nsteps', nsteps
+      print *, 'COMPOSE> nsteps', nsteps
     end if
-    dt = twelve_days / nsteps
+    dt = twelve_days/nsteps
     call t_startf('compose_stt_step')
     do i = 1, nsteps
-       tprev = dt*(i-1)
-       t = dt*i
-       do ie = nets, nete
-          call compose_stt_fill_v(ie, elem(ie)%spherep, tprev, &
-               elem(ie)%derived%vstar)
-          call compose_stt_fill_v(ie, elem(ie)%spherep, t, &
-               elem(ie)%state%v(:,:,:,:,tl%np1))
-       end do
-       tl%nstep = tl%nstep + qsplit
-       call prim_advec_tracers_remap_ale(elem, deriv, hvcoord, hybrid, dt, tl, nets, nete)
-       if (mod(i,statefreq) == 0) then
-          call print_software_statistics(hybrid, nets, nete)
-       end if
+      tprev = dt*(i - 1)
+      t = dt*i
+      do ie = nets, nete
+        call compose_stt_fill_v(ie, elem(ie)%spherep, tprev, &
+                                elem(ie)%derived%vstar)
+        call compose_stt_fill_v(ie, elem(ie)%spherep, t, &
+                                elem(ie)%state%v(:, :, :, :, tl%np1))
+      end do
+      tl%nstep = tl%nstep + qsplit
+      call prim_advec_tracers_remap_ale(elem, deriv, hvcoord, hybrid, dt, tl, nets, nete)
+      if (mod(i, statefreq) == 0) then
+        call print_software_statistics(hybrid, nets, nete)
+      end if
     end do
     call t_stopf('compose_stt_step')
     ! Record final q values.
     call compose_stt_begin_record()
     call timelevel_qdp(tl, qsplit, n0_qdp, np1_qdp)
     do ie = nets, nete
-       call compose_stt_record_q(ie, elem(ie)%spherep, elem(ie)%spheremp, &
-            tl%np1, elem(ie)%state%dp3d, np1_qdp, elem(ie)%state%qdp)
+      call compose_stt_record_q(ie, elem(ie)%spherep, elem(ie)%spheremp, &
+                                tl%np1, elem(ie)%state%dp3d, np1_qdp, elem(ie)%state%qdp)
     end do
     ! Do the global reductions, print diagnostic information, and clean up.
     call compose_stt_finish(hybrid%par%comm, hybrid%par%root, hybrid%par%rank)

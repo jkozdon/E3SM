@@ -49,8 +49,8 @@ contains
     call c_f_pointer(sunmat%ops, matops)
 
     ! set matrix operations
-    matops%getid   = c_funloc(FSUNMatGetID_HOMME)
-    matops%clone   = c_funloc(FSUNMatClone_HOMME)
+    matops%getid = c_funloc(FSUNMatGetID_HOMME)
+    matops%clone = c_funloc(FSUNMatClone_HOMME)
     matops%destroy = c_funloc(FSUNMatDestroy_HOMME)
 
   end function FSUNMatrix_HOMME
@@ -87,7 +87,7 @@ contains
     type(c_ptr)     :: b_ptr
 
     type(SUNMatrix), pointer :: sunmat_b
-    integer(c_int),  pointer :: retval
+    integer(c_int), pointer :: retval
 
     ! allocate SUNMatrix structure
     sunmat_b => FSUNMatNewEmpty()
@@ -152,15 +152,15 @@ contains
 
     ! set linear solver operations
     lsops%gettype = c_funloc(FSUNLinSolGetType_HOMME)
-    lsops%solve   = c_funloc(FSUNLinSolSolve_HOMME)
-    lsops%free    = c_funloc(FSUNLinSolFree_HOMME)
+    lsops%solve = c_funloc(FSUNLinSolSolve_HOMME)
+    lsops%free = c_funloc(FSUNLinSolFree_HOMME)
 
   end function FSUNLinSol_HOMME
 
   !=============================================================================
 
   integer(SUNLinearSolver_Type) function FSUNLinSolGetType_HOMME(sunls) &
-       result(type) bind(C)
+    result(type) bind(C)
     !---------------------------------------------------------------------------
     ! Return the linear solver type
     !---------------------------------------------------------------------------
@@ -179,7 +179,7 @@ contains
   !=============================================================================
 
   integer(c_int) function FSUNLinSolSolve_HOMME(sunls_s, sunmat_a, sunvec_x, sunvec_b, tol) &
-       result(ier) bind(C)
+    result(ier) bind(C)
     !---------------------------------------------------------------------------
     ! SUNLinSolSolve_HOMME is the C interface routine to call the
     ! Fortran-supplied FCOLUMNSOL_SOLVE routine.
@@ -241,7 +241,7 @@ contains
     type(SUNLinearSolver) :: sunls
 
     ! detach arkode mem pointer
-    nullify(arkmem)
+    nullify (arkmem)
 
     ! free vector pointer
     call FN_VDestroyVectorArray(ycur_ptr, 1)
@@ -254,7 +254,7 @@ contains
   !=============================================================================
 
   integer(c_int) function FARKodeLinSysFn(t, y, fy, A, M, jok, jcur, gamma, user_data, tmp1, tmp2, tmp3) &
-       result(ier) bind(C)
+    result(ier) bind(C)
     !---------------------------------------------------------------------------
     ! dummy linear system function
     !---------------------------------------------------------------------------
